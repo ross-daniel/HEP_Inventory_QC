@@ -1,0 +1,73 @@
+<html>
+<head>
+  <title>HEP Inventory</title>
+  <link rel="stylesheet" href="new_stylesheet.css">
+</head>
+
+<body>
+  <div class="input">
+    <center><h1>Choose the Type of Item to Search</h1></center>
+    <center>
+    <form name="radioField">
+      <input type="radio" name="myRadios" value="1" id="cableRadio" class="radio">
+      <label for="cableRadio">Cable</label>
+
+      <input type="radio" name="myRadios" value="2" id="mechRadio" class="radio">
+      <label for="mechRadio">Mechanical Item</label>
+    </form>
+    </center>
+
+    <center>
+    <div class="inputField" id="mech">
+      <label for="partDescription">Part Description: </label>
+      <input type="text" id="partDescription">
+
+      <label for="lineNumber">Line Number: </label>
+      <input type="text" id="lineNumber">
+    </div>
+    </center>
+
+    <center>
+    <div class="inputField" id="cable">
+      <label for="cableType">Cable Type: </label>
+      <select id="cableType">
+        <option value="Passthroughs">Passthrough</option>
+        <option value="Uppers">Upper</option>
+        <option value="Lowers">Lower</option>
+      </select>
+      <label for="cableNumber">Cable Number: </label>
+      <input type="number" id="cableNumber">
+
+      <label for="batchNumber">Batch Number: </label>
+      <input type="text" id="batchNumber">
+    </div>
+    </center>
+    <br>
+    <center>
+    <div id="barcodeSearch" class="input">
+      <center><h2> or search by barcode </h2></center>
+      <br>
+      <label for="barcodeInput">Barcode: </label>
+      <input type="text" id="barcodeInput" value=""/>
+    </div>
+    </center>
+
+    <center>
+    <button id="submitSearchBtn" type="button">Search</button>
+    </center>
+  </div>
+
+  <div class="output">
+    <center>
+    <table id="dataTable">
+      <thead id="tableHeader"></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    </center>
+  </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js" integrity="sha512-SGWgwwRA8xZgEoKiex3UubkSkV1zSE1BS6O4pXcaxcNtUlQsOmOmhVnDwIvqGRfEmuz83tIGL13cXMZn6upPyg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="module" src="script.js">
+</script>
+</body>
+
+</html>

@@ -3,6 +3,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-analytics.js";
+
+//import {readFileSync, promises as fsPromises} from 'fs';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -83,6 +85,10 @@ for (var i = 0; i < rad.length; i++) {
         }
         console.log(this.value)
     });
+}
+function toBottom()
+{
+    window.scrollTo(0, document.body.scrollHeight);
 }
 
 const csvData = 'Barcode Number,Line Item,Part Description,Part Number,Qty / Shipment,Distributor\n\
@@ -170,12 +176,10 @@ const csvData = 'Barcode Number,Line Item,Part Description,Part Number,Qty / Shi
 50000yyy910x,910,"1-16"" Heat Shrink",517-301116BU/REEL,30,Mouser\n\
 50000yyy911x,911,Cable,,495,\n'
 
-var fs = require("fs");
+//var fs = require("fs");
 var barcode_table;
-fs.readFile("barcode.txt", function(text){
-  barcode_table = text.split("\n").map(function(row){return row.split(",");});
-});
-
+//const content = readFileSync("barcode.txt", 'utf-8');
+barcode_table = csvData.split("\n").map(function(row){return row.split(",");});
 
 console.log(barcode_table);
 
@@ -291,8 +295,8 @@ function createCableTable(snapshot, whole_batch, label){
       header.innerHTML = qc_order[i];
       headerRow.appendChild(header);
     }
-    table_header.appendChild(headerRow);
-    table.appendChild(table_header);
+    //table_header.appendChild(headerRow);
+    table.appendChild(headerRow);
 
     for(let i = 1; i < 11; i++){
       let dataRow = document.createElement('tr');
@@ -367,6 +371,7 @@ function createMechTable(snapshot, itemName){
 }
 
 function submitSearch(){
+  toBottom();
   table.innerHTML = '';
   barcode = barcodeElement.value;
   label = '';

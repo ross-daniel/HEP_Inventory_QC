@@ -11,9 +11,9 @@
 
 .output {
   position: absolute;
-	top: 100%;
-	left: 50%;
-	transform: translate(-50%, -50%);
+  top: 80%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   padding: 15px;
   padding-top: 300px;
 }

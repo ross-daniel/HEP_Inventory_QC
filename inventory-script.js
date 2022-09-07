@@ -363,8 +363,9 @@ function createMechTable(snapshot, itemName){
   let tr1 = document.createElement('tr');
   let td1 = document.createElement('td');
   let td2 = document.createElement('td');
+  console.log(snapshot);
   td1.innerHTML = Object.keys(snapshot)[0];
-  td1.innerHTML = Object.values(snapshot)[0];
+  td2.innerHTML = Object.values(snapshot)[0];
   tr1.appendChild(td1);
   tr1.appendChild(td2);
   table.appendChild(tr1);
@@ -460,7 +461,7 @@ function submitSearch(){
     get(child(dbRef, 'Mechanical/' + itemName)).then((snapshot) => {
       if(snapshot.exists()){
         console.log(snapshot.val());
-        createMechTable(snapshot, itemName);
+        createMechTable(snapshot.val(), itemName);
       }else{
         console.log('no data available');
       }

@@ -28,7 +28,7 @@ print(args)
 # TODO: Figure Out a way to more easily pass database references to other classes
 
 #retrieve admin credentials
-cred = credentials.Certificate('ENTER JSON CREDENTIALS FILENAME HERE')
+cred = credentials.Certificate('hep-test-eef24-firebase-adminsdk-8mx4y-5b2db3c614.json')
 
 # Initialize the app with a service account, granting admin privileges
 firebase_admin.initialize_app(cred, {

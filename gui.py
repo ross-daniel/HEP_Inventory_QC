@@ -13,6 +13,7 @@
 
 # TODO: Make Everything Look Nicer
 # TODO: Add Mechanical QC Methods and Frames
+# TODO: Add SASEBO QC
 
 import tkinter as tk
 from Student import Student
@@ -25,13 +26,13 @@ import os
 # setup root
 root = tk.Tk()
 root.configure(background='#F0F8FF')
-root.title('Colorado State University HEPS Lab')
+root.title('Colorado State University HEP Lab')
 
 # ---------------------setup a canvas----------------------- #
 
 # set up background image
 bg = Image.open('CSU-Ram-357-617.png')
-resized_image= bg.resize((480,480), Image.ANTIALIAS)
+resized_image= bg.resize((480, 480), Image.ANTIALIAS)
 backdrop= ImageTk.PhotoImage(resized_image)
 
 # setup canvas
@@ -305,7 +306,7 @@ def addQuantity(obj, qty):
     mechanicalItemFrame.grid(column=0, row=0)
     mechanicalItemFrame.tkraise()
     mechanicalItemFrame.wait_variable(current_qty)  # wait for user input
-    return current_qty.get()  # return user input to main
+    return current_qty.get() # return user input to main
 
 
 # Show the 'Cable QC' Frame and wait for the user to submit

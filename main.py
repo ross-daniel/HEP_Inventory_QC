@@ -1,11 +1,11 @@
-#--------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------
 #
 #   Main program for CSU HEP Lab Inventory System, controls all data flow
 #
 #                       created by: Ross Stauder
 #                           rev: August 2022
 #             DUNE - Deep Underground Neutrino Experiment
-#--------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------
 
 from Cable import Cable
 from Item import Item
@@ -19,20 +19,20 @@ import gui
 import os
 import sys
 
-#get program arguments, used to keep a user signed in across multiple sessions
+# get program arguments, used to keep a user signed in across multiple sessions
 args = sys.argv[1:]
 print(args)
 
-#-------DATABASE SETUP-------#
+# -------DATABASE SETUP-------#
 
 # TODO: Figure Out a way to more easily pass database references to other classes
 
 #retrieve admin credentials
-cred = credentials.Certificate('hep-test-eef24-firebase-adminsdk-8mx4y-5b2db3c614.json')
+cred = credentials.Certificate('hep---dune-firebase-adminsdk-gtwlw-40673207a6.json')
 
 # Initialize the app with a service account, granting admin privileges
 firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://hep-test-eef24-default-rtdb.firebaseio.com/'
+    'databaseURL': 'https://hep---dune-default-rtdb.firebaseio.com'
 })
 
 # As an admin, the app has access to read and write all data

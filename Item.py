@@ -21,8 +21,17 @@ class Item:
     # gets the current quantity of self in the DB
     def getQty(self, ref):
         ref = ref.child('Mechanical').child(self.name).get()
-        print(ref.get('qty'))
+        try:
+            print(ref.get('qty'))
+        except AttributeError as e:
+            print("Item has not been initialized")
+            print(e)
+            return 0
         return int(ref.get('qty'))
+
+    def updateSpreadSheet(self, qty):
+        # TODO: Write a method that automatically updates an inventory spreadsheet
+        print("this method is not yet functional")
 
     # sends an automated email to Zach Rautio when an items stock reaches a low quantity
     def sendEmail(self, stock):

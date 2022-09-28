@@ -24,10 +24,7 @@ class Cable:
         code = list(map(int, str(self.product_code)))
 
         # check the 2nd most significant digit (denotes cable number)
-        if code[1] == 0:
-            self.cableNumber = 10
-        else:
-            self.cableNumber = code[1]
+        self.cableNumber = code[1]
 
         # check most significant digit (denotes type of cable)
         # once type of cable is determined, find the length
@@ -69,7 +66,11 @@ class Cable:
     # sends a JSON packet to firebase and stores the data in the proper part of the tree
     def postToDB(self, operation, name, reference):
         date = str(datetime.date(datetime.now()))
-        ref = reference.child(self.cableType).child('Batch').child(self.batch).child(str(self.cableNumber))  # finds proper reference
+        if(self.cableNumber == 0):
+            num = 10
+        else:
+            num = self.cableNumber
+        ref = reference.child(self.cableType).child('Batch').child(self.batch).child(str(num))  # finds proper reference
         ref.update({operation: name + " -- " + date})  # updates database
         print("Database Updated")
 

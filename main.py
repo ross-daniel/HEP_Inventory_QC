@@ -3,7 +3,7 @@
 #   Main program for CSU HEP Lab Inventory System, controls all data flow
 #
 #                       created by: Ross Stauder
-#                           rev: August 2022
+#                           rev: October 2022
 #             DUNE - Deep Underground Neutrino Experiment
 # --------------------------------------------------------------------------------------------
 
@@ -81,6 +81,7 @@ while True:
         obj.postToDB(op, username, ref)  # call the post to DB method of the cable class
         sys.argv.append(csuid)  # add the current user to program arguments to keep them signed in
         os.execl(sys.executable, sys.executable, *sys.argv)  # restarts the current program
+        print("Shouldn't get here")
     else:
         # Mechanical Item
         obj = Item(barcode)  # create object
@@ -88,6 +89,8 @@ while True:
         obj.postToDB(qty, ref)  # call the post to DB method of the Item class
         sys.argv.append(csuid)  # add the current user to program arguments to keep them signed in
         os.execl(sys.executable, sys.executable, *sys.argv)  # restarts the current program
+        print("Shouldn't get here")
+
 
 gui.root.mainloop()
 

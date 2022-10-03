@@ -11,14 +11,14 @@ import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyCb-aGNDYWIe4cCzKCNNoVzm-VSVXoXvfQ",
-  authDomain: "hep-test-eef24.firebaseapp.com",
-  databaseURL: "https://hep-test-eef24-default-rtdb.firebaseio.com",
-  projectId: "hep-test-eef24",
-  storageBucket: "hep-test-eef24.appspot.com",
-  messagingSenderId: "389961771657",
-  appId: "1:389961771657:web:e5eb1bed4e39357741f458",
-  measurementId: "G-5MFDWDK0R8"
+  apiKey: "AIzaSyDHVBBKn17xeLD71ZWbJ_4Fp5hsvXAPCow",
+  authDomain: "hep---dune.firebaseapp.com",
+  databaseURL: "https://hep---dune-default-rtdb.firebaseio.com",
+  projectId: "hep---dune",
+  storageBucket: "hep---dune.appspot.com",
+  messagingSenderId: "821178691057",
+  appId: "1:821178691057:web:32be280f7c2bbc3bb32850",
+  measurementId: "G-HP0CBW4REV"
 };
 
 // Initialize Firebase

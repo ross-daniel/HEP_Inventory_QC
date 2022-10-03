@@ -57,7 +57,7 @@ class Item:
     # determines part details based on product code
     # reads csv file and creates a 2D array of product codes and their corresponding parameters
     def readProductCode(self):
-        target = 'y' + self.product_code[8] + self.product_code[9] + self.product_code[10]
+        target = f"y{self.product_code[8]}{self.product_code[9]}{self.product_code[10]}";
         print(target)
         for index, item in enumerate(Item.inventory_list):
             if target in item[0]:

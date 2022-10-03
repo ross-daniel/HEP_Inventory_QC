@@ -20,10 +20,7 @@ import csv
 
 
 def convert(x, op_file):
-    # Creating the csv file for storing the final output
-    outputfile = op_file
-    # This opens the newly created file to write to it
-    newfile = open(outputfile, "w")
+
     # Creates an object with the ability to write to the new file
     playmaker = csv.writer(newfile)
     # This is an empty array to store all the individual items after the "/n" have been added
@@ -40,5 +37,9 @@ def convert(x, op_file):
         "".join(totalitems)
         # Writes the combined string into the output csv file
         playmaker.writerow(totalitems)
-    newfile.close()
+    # Creating the csv file for storing the final output
+    outputfile = op_file
+    # This opens the newly created file to write to it
+    with open(outputfile, "w") as newfile:
+        newfile.close()
     return newfile

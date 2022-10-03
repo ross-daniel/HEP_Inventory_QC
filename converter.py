@@ -21,8 +21,6 @@ import csv
 
 def convert(x, op_file):
 
-    # Creates an object with the ability to write to the new file
-    playmaker = csv.writer(newfile)
     # This is an empty array to store all the individual items after the "/n" have been added
     totalitems = []
     with open(x) as csvfile:
@@ -35,11 +33,13 @@ def convert(x, op_file):
                 totalitems.append(i)
             # Converting the array of items into one combined string
         "".join(totalitems)
-        # Writes the combined string into the output csv file
-        playmaker.writerow(totalitems)
-    # Creating the csv file for storing the final output
-    outputfile = op_file
-    # This opens the newly created file to write to it
-    with open(outputfile, "w") as newfile:
-        newfile.close()
+        # Creating the csv file for storing the final output
+        outputfile = op_file
+        # This opens the newly created file to write to it
+        with open(outputfile, "w") as newfile:
+            # Creates an object with the ability to write to the new file
+            playmaker = csv.writer(newfile)
+            # Writes the combined string into the output csv file
+            playmaker.writerow(totalitems)
+            newfile.close()
     return newfile

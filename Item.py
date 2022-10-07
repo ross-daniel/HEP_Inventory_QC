@@ -66,15 +66,9 @@ class Item:
 
     # updates the inventory of the given item by a given quantity
     def postToDB(self, qty, reference):
-        if self.product_code[0] == '4' or self.product_code[0] == '5':
-            # mechanical item
-            ref = reference.child('Mechanical')
-        else:
-            # electrical item
-            print('ERROR: current item is not mechanical')
+        ref = reference.child('Mechanical')
         if self.name in ref.get().keys():
             # item already exists in the database
-
             # find the current quantity of the item
             currQty = int(ref.child(self.name).get().get('qty'))
             if (currQty + int(qty) < int(self.ship_quantity)*2) and currQty >= 2*int(self.ship_quantity):

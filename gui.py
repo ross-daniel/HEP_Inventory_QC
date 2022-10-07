@@ -43,7 +43,6 @@ canvas.grid(columnspan=1, rowspan=1)
 height = 480
 width = 800
 
-
 # global variable to pass to main
 current_entry = tk.StringVar()
 current_csuid = tk.StringVar()
@@ -232,6 +231,9 @@ def setupMech():
     btn = tk.Button(mechanicalItemFrame, text=' Submit ', command=lambda: submitMech(qtyEntry))
     btn.config(height=2, width=10)
     btn.grid(column=1, row=4)
+    exitBtn = tk.Button(mechanicalItemFrame, text=' exit ', command=lambda: exit())
+    exitBtn.config(height=2, width=10)
+    exitBtn.grid(column=2, row=4)
 
 
 def setupCable():
@@ -256,6 +258,9 @@ def setupCable():
     btn = tk.Button(cableFrame, text=' Submit ', command=lambda: submitCable(r.get()))
     btn.config(height=2, width=10)
     btn.grid(column=1, row=9)
+    exitBtn = tk.Button(cableFrame, text=' exit ', command=lambda: exit())
+    exitBtn.config(height=2, width=10)
+    exitBtn.grid(column=2, row=9)
 
 
 # ----------INITIALIZE FRAMES-------------- #

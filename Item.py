@@ -9,7 +9,7 @@
 #--------------------------------------------------------------------------------------------
 
 import csv
-import yagmail
+#import yagmail
 
 
 class Item:
@@ -49,10 +49,10 @@ class Item:
         message += 'Current Stock: ' + str(stock) + '\n'
 
         # send the email
-        with yagmail.SMTP(sender_addr, app_password) as yag:
-            yag.send(reciever_addr, subject, message)
-            print(message)
-            print('Sent email successfully')
+        #with yagmail.SMTP(sender_addr, app_password) as yag:
+        #    yag.send(reciever_addr, subject, message)
+        #    print(message)
+        #    print('Sent email successfully')
 
     # determines part details based on product code
     # reads csv file and creates a 2D array of product codes and their corresponding parameters

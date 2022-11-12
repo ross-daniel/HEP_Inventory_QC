@@ -36,12 +36,15 @@ resized_image= bg.resize((480, 480), Image.ANTIALIAS)
 backdrop= ImageTk.PhotoImage(resized_image)
 
 # setup canvas
-canvas = tk.Canvas(root, width=800, height=480)
-canvas.create_image( 0, 0, image = backdrop, anchor = "nw")
-canvas.grid(columnspan=1, rowspan=1)
 
 height = 480
 width = 800
+
+canvas = tk.Canvas(root, width=width, height=height)
+canvas.create_image(0, 0, image = backdrop, anchor = "nw")
+canvas.grid(columnspan=1, rowspan=1)
+
+
 
 # global variable to pass to main
 current_entry = tk.StringVar()

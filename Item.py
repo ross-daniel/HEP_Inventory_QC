@@ -35,6 +35,9 @@ class Item:
 
     # sends an automated email to Zach Rautio when an items stock reaches a low quantity
     def sendEmail(self, stock):
+
+        # TODO: Fix this method to work without Yagmail (library is deprecated)
+
         # create necessary parameters
         sender_addr = 'csuhighenergy@gmail.com'
         reciever_addr = 'stauderross@gmail.com'#'Zach.Rautio@colostate.edu'

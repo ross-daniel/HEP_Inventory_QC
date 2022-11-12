@@ -11,6 +11,7 @@ from Cable import Cable
 from Item import Item
 from Student import Student
 from converter import convert
+from sheet import *
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
@@ -84,11 +85,26 @@ while True:
         print("Shouldn't get here")
     else:
         # Mechanical Item
+
+        # ------ update database ------
         obj = Item(barcode)  # create object
         qty = gui.addQuantity(obj, obj.getQty(ref))  # display the inventory update screen on the GUI
         obj.postToDB(qty, ref)  # call the post to DB method of the Item class
+        # -----------------------------
+        # ------ update spreadsheet ------
+        ssheet = Sheet('1p6vJq1YAcuMJRGgKecN69mWAD2SYinKMn4tVIRqRXC8', 'InventorySheet')
+        cell_rep = ssheet.find_cell_rep(barcode, 'Stock')           # finds [row, col] for the required cell
+        curr_qty = ssheet.get_data(cell_rep[0], cell_rep[1])       # finds the current quantity of the item
+        if curr_qty == '':
+            curr_qty = 0
+        else:
+            curr_qty = int(curr_qty)
+        ssheet.post_data(cell_rep[0], cell_rep[1], curr_qty+qty)    # updates the spreadsheet
+        # --------------------------------
+        # ------ restart the program ------
         sys.argv.append(csuid)  # add the current user to program arguments to keep them signed in
         os.execl(sys.executable, sys.executable, *sys.argv)  # restarts the current program
+        # ---------------------------------
         print("Shouldn't get here")
 
 

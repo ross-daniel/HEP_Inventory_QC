@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "lofty-hybrid-309223",
+  "private_key_id": "20aed3bad4331a810ff7c5c6f2ca99f43aecbd23",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDLpzB2dUcq8maw\np47SD7u1gEiMU+DIPNTxMfnup8aLRgtDEHVs7Zvhvvxwhg92z/jjzHtppSjJl32j\nZdZE36CKtXdtKp21TuDkQ9aW2OLYa7tGpqIRRWZ4OQYoJBW33ddwOfRCKFFWPFwT\njwPQ8ckY/1Y1sJmziDLVXZT13kjJ58F2A5RPGwFlohn0aCCCmI7MMlNXnlHiCgxV\n4S3kqUMBFz+RwLWY0uW93vjATGWDybfmGS4I6P5ruMUjddnGUIjzukPIxgf0e3QB\nvthuL8B2R3qXPv9Yvyzy3IvwF3eQrMQQyLtpzIUvqkovdCBN7JvU0qNXxnq8Rg30\nor/gvlI3AgMBAAECggEAESQFRDMixk6Yrg2sS6nfVqtxb74vkSrtkU9vhdLBNz+x\n+vcLqxtkn19/x8jAzHM8s4+mY4HvKOiDPpl3q1xXGtWjM6D+nSACdbPv/8pJbYXD\nwXKM+X8p3LyP9Bj1awBU/bEjCd5y2htCdLL400FGd8Al9WbjyOSRwruZqggHgFbG\nwaVI1cKPM+YROPVQFRJmBWFvFbBgTuaUy6ZpCyfvJIJvEczCVX2kMQHlYalVbBFW\np8MzKNlG/Ec9uQksBF21reFvwd9zI36kIvDizxWAeH1BYJzVGjaGd+dQLa1BKeFT\nEoJyc0YZ+ECl0r0GMm+v6L+kNrJwk5IrLBT1ELaCwQKBgQDzhG3fmILoN1S5PteH\nM1VW81fBlPJFXhLS3w2KCTRi2Cpvw3/U8QNBic006/xhShP3XI4urbJ/WdqlT0eM\nPkoaaZAxwwkhzI6XYI63Gh2ZxvEpeGta9vvtWfry3HxTIoNjK4+n+bawsH1773QT\nSOM1pxAKe1aIRzUIhfZFnSZpLwKBgQDWF6OzFjpN+YVjuYgC1ECpSNIxo4JfWGQ1\n1Vrw02227ULIjgeCDzb3P3t4Sy7UQ8rJ9DNssnG5SgOH9gTbGsmhy7ymwObOoOGO\nB51kWLKQ9xm2BdkhvAB6hL/Orl1gnlAiJ/vFBGMvWhxfc0pzJc7QKPRN8F0LnHsU\nvHOeM3ZVeQKBgQDqlqK6CdPiHJtzsUQzrJIDp3zcsb4KcSu1FMeYOHHM3u1SqYTW\nAC/gzP1wg/2nQ5OkcfdOpGoWINtu8Ma+JauBcjxEk9ySQNsEnTIe1fu6Dlp4Vtck\n1FWxO0Ny/lCOTetAd9B2QytpXzwjTnQFt+uZ3gyn7FVaBy7hvRuXyGIeZQKBgFQc\nrX/qt7Vy1uk7NyiFY3Ie3hYKe2oiPBy6WiRLrMs1pAtPYbvDZoD1O/ki8J8Mk1uM\nybdm1C9L2N9N1NKQT691cATDvOppYrR+YWPPRTiXHE7bNVd/mWCJTyJQdvdCu5Dv\nzIa3FpDAAm2tyg47SGmX7YPBb4zkSab38ySwa0lhAoGAFgXSajxN2NkhepiMGruJ\nwl/3qvzlanFkmrlUe3C05DmBE5mAKxMlzdlytGR5xPALVi6QIpcjNIPieyRM+lCt\nJUaK9IWpSBrv3+1ldYrK1Uj1En2JCpCcsU8QD6wbHmxE7TKjSTFmPgLTfOGDbVXI\nmnIxURlEoeucjYt8hy80LEM=\n-----END PRIVATE KEY-----\n",
+  "client_email": "service-account@lofty-hybrid-309223.iam.gserviceaccount.com",
+  "client_id": "116496039049524750647",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/service-account%40lofty-hybrid-309223.iam.gserviceaccount.com"
+}

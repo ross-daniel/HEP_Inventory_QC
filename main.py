@@ -78,7 +78,7 @@ while True:
     if int(barcode[0]) < 4:
         # Cable
         obj = Cable(int(barcode))  # create object
-        op = gui.addCableQC(obj)  # display the cable QC form on the GUI
+        op = gui.addCableQC(obj, ref)  # display the cable QC form on the GUI
         obj.postToDB(op, username, ref)  # call the post to DB method of the cable class
         sys.argv.append(csuid)  # add the current user to program arguments to keep them signed in
         os.execl(sys.executable, sys.executable, *sys.argv)  # restarts the current program
@@ -88,11 +88,13 @@ while True:
 
         # ------ update database ------
         obj = Item(barcode)  # create object
+        curr_DBqty = obj.getQty(ref)
         qty = gui.addQuantity(obj, obj.getQty(ref))  # display the inventory update screen on the GUI
         obj.postToDB(qty, ref)  # call the post to DB method of the Item class
         # -----------------------------
         # ------ update spreadsheet ------
-        ssheet = Sheet('1p6vJq1YAcuMJRGgKecN69mWAD2SYinKMn4tVIRqRXC8', 'InventorySheet')
+        #1jTo9i7WWuXcAUqeUFaboLPtBhbBWiRnmsODXOV0u3-o
+        ssheet = Sheet('1cLLx9eAhPwMRBq-8NWbToL408jOAgZCuEcejaFOKW-k', 'InventorySheet')
         cell_rep = ssheet.find_cell_rep(barcode, 'Stock')           # finds [row, col] for the required cell
         curr_qty = ssheet.get_data(cell_rep[0], cell_rep[1])       # finds the current quantity of the item
         if curr_qty == '':
@@ -100,6 +102,11 @@ while True:
         else:
             curr_qty = int(curr_qty)
         ssheet.post_data(cell_rep[0], cell_rep[1], curr_qty+qty)    # updates the spreadsheet
+
+        # make sure the spreadsheet and database show the same value
+        if curr_qty != curr_DBqty:
+            gui.showMessage("Database and Spreadsheet hold different values, please take a count of this item and update the proper location", "INVENTORY INCONSISTENCY")
+
         # --------------------------------
         # ------ restart the program ------
         sys.argv.append(csuid)  # add the current user to program arguments to keep them signed in

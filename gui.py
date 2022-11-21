@@ -64,10 +64,12 @@ r.set(1)
 
 # ------HELPER METHODS FOR MISC TKINTER STUFF----- #
 
+
 # clears whatever frame is passed in
 def clearFrame(frame):
     for widgets in frame.winfo_children():
         widgets.destroy()
+
 
 # Method For Sign Out, returns to Sign In Page
 def exit():
@@ -78,6 +80,10 @@ def exit():
         args = sys.argv[1:]
     os.execl(sys.executable, sys.executable, *sys.argv)  # restarts the current program
 
+
+# displays a message in the TKinter window
+def showMessage(message, title):
+    messagebox.showinfo(title, message)
 
 # ---------------------------METHODS FOR SUBMIT BUTTONS ON EACH FRAME-------------------------- #
 
@@ -239,12 +245,15 @@ def setupMech():
     exitBtn.grid(column=2, row=4)
 
 
-def setupCable():
+def setupCable(curr_step):
     # third frame p2
     label = tk.Label(cableFrame, text='Cable: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
     label.grid(column=0, row=0)
     cableLabel = tk.Label(cableFrame, text=current_object.name, bg='#F0F8FF', font=('arial', 14, 'normal'))
     cableLabel.grid(column=1, row=0)
+    tk.Label(cableFrame, text="Last Sign-Off: ", bg='#F0F8FF', font=('arial', 14, 'normal')).grid(column=0, row=1)
+    curr_step_label = tk.Label(cableFrame, text=curr_step, bg='#F0F8FF', font=('arial', 14, 'normal'))
+    curr_step_label.grid(column=1, row=1)
     options = [
         ('Cut to Length', 1),
         ('Labeled', 2),
@@ -257,13 +266,13 @@ def setupCable():
         ('Verify QC', 9)
     ]
     for option, val in options:
-        tk.Radiobutton(cableFrame, text=option, variable=r, value=val).grid(column=0, row=val)
+        tk.Radiobutton(cableFrame, text=option, variable=r, value=val).grid(column=0, row=val+1)
     btn = tk.Button(cableFrame, text=' Submit ', command=lambda: submitCable(r.get()))
     btn.config(height=2, width=10)
-    btn.grid(column=1, row=9)
+    btn.grid(column=1, row=10)
     exitBtn = tk.Button(cableFrame, text=' exit ', command=lambda: exit())
     exitBtn.config(height=2, width=10)
-    exitBtn.grid(column=2, row=9)
+    exitBtn.grid(column=2, row=10)
 
 
 # ----------INITIALIZE FRAMES-------------- #
@@ -318,10 +327,10 @@ def addQuantity(obj, qty):
 
 
 # Show the 'Cable QC' Frame and wait for the user to submit
-def addCableQC(obj):
+def addCableQC(obj, ref):
     global current_object
     current_object = obj
-    setupCable()
+    setupCable(obj.find_step(ref))
     cableFrame.grid(column=0, row=0)
     clearFrame(scanItemFrame)
     cableFrame.tkraise()

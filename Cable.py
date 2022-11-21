@@ -18,6 +18,10 @@ class Cable:
     upperLen = ['6570', '0780', '1390', '2075', '2685', '3370', '3980', '4665', '5275', '5960']
     lowerLen = ['6109', '0579', '1219', '1778', '2438', '2985', '3632', '4197', '4851', '5436']
 
+    # QC steps
+
+    steps = ['Cut to Length', 'Labeled', 'Headers', 'Stripped', 'Connector', 'Prelim Test', 'Heat Shrink', 'Final Test']
+
     # determines the value of class variables based on the product code
     def readProductCode(self):
         # convert the number into a list of integers
@@ -73,6 +77,27 @@ class Cable:
         ref = reference.child(self.cableType).child('Batch').child(self.batch).child(str(num))  # finds proper reference
         ref.update({operation: name + " -- " + date})  # updates database
         print("Database Updated")
+
+    # finds the most recent step signed off on for a given cable
+    def find_step(self, reference):
+        if self.cableNumber == 0:
+            num = 10
+        else:
+            num = self.cableNumber
+        try:
+            keys = reference.child(self.cableType).child('Batch').child(self.batch).child(str(num)).get().keys()
+        except AttributeError as err:
+            print(err)
+            return "None"
+        recent = "None"
+        index = -1
+        for item in keys:
+            indx = Cable.steps.index(item)
+            if indx > index:
+                index = indx
+        if index >= 0:
+            recent = Cable.steps[index]
+        return recent
 
     def __init__(self, code):
         self.product_code = code

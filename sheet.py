@@ -105,7 +105,11 @@ class Sheet:
             print(err)
             return -1
         values = new_response.get('values', [])
-        val = values[row-1][col-1]
+        try:
+            val = values[row-1][col-1]
+        except IndexError as err:
+            val = 0
+            print(err)
         return val
 
     # returns an entire row (true) or column (false)

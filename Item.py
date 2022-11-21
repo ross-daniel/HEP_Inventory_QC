@@ -73,7 +73,7 @@ class Item:
         if self.name in ref.get().keys():
             # item already exists in the database
             # find the current quantity of the item
-            currQty = int(ref.child(self.name).get().get('qty'))
+            currQty = self.getQty(reference)
             if (currQty + int(qty) < int(self.ship_quantity)*2) and currQty >= 2*int(self.ship_quantity):
                 # send automated email to zach if quantity drops below shipment quantity
                 self.sendEmail(currQty + int(qty))

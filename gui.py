@@ -104,7 +104,7 @@ def submitID(value):
     #    if value in item:
     #       flag = True
     # raise exception if an ID of incorrect value is entered
-    if len(value) != 9 and len(value) != 10:
+    if len(value) != 9 and len(value) != 12:
         messagebox.showinfo('Invalid Code', 'Error: The Barcode you Entered is Invalid')
         raise ValueError('The ID that was entered contains the wrong number of digits (expected: 9)')
     # raise exceptions if employee does not exist in database
@@ -123,9 +123,9 @@ def submitID(value):
 # submit button method for scanItem Frame
 def submitItem(code):
     # check for correct barcode length
-    if len(code) != 12:
-        messagebox.showinfo('Invalid Code', 'Error: The Barcode you Entered is Invalid')
-        raise ValueError('Incorrect Barcode: Wrong Number of Digits')
+    if len(code) > 12 or len(code) < 9:
+       messagebox.showinfo('Invalid Code', 'Error: The Barcode you Entered is Invalid')
+       raise ValueError('Incorrect Barcode: Wrong Number of Digits')
     # send barcode back to main
     else:
         current_barcode.set(code)

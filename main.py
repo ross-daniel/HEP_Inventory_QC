@@ -88,14 +88,23 @@ while True:
 
         # ------ update database ------
         obj = Item(barcode)  # create object
-        curr_DBqty = obj.getQty(ref)
         qty = gui.addQuantity(obj, obj.getQty(ref))  # display the inventory update screen on the GUI
-        obj.postToDB(qty, ref)  # call the post to DB method of the Item class
+        if gui.cleaned:
+            curr_DBqty = obj.getClean(ref)
+        else:
+            curr_DBqty = obj.getQty(ref)
+        obj.postToDB(qty, gui.cleaned, ref)
         # -----------------------------
         # ------ update spreadsheet ------
         #1jTo9i7WWuXcAUqeUFaboLPtBhbBWiRnmsODXOV0u3-o
         ssheet = Sheet('1cLLx9eAhPwMRBq-8NWbToL408jOAgZCuEcejaFOKW-k', 'InventorySheet')
-        cell_rep = ssheet.find_cell_rep(barcode, 'Stock')           # finds [row, col] for the required cell
+
+        # finds [row, col] for the required cell
+        if gui.cleaned:
+            cell_rep = ssheet.find_cell_rep(barcode, 'Cleaned')
+        else:
+            cell_rep = ssheet.find_cell_rep(barcode, 'Stock')
+
         curr_qty = ssheet.get_data(cell_rep[0], cell_rep[1])       # finds the current quantity of the item
         if curr_qty == '':
             curr_qty = 0

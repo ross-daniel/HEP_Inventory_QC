@@ -51,6 +51,7 @@ current_entry = tk.StringVar()
 current_csuid = tk.StringVar()
 current_barcode = tk.StringVar()
 current_qty = tk.IntVar()
+cleaned = False
 current_operation = tk.StringVar()
 current_object = None
 current_database_qty = 0
@@ -58,6 +59,9 @@ current_database_qty = 0
 # variables for radio buttons
 v = tk.IntVar()
 v.set(1)
+
+var = tk.IntVar()
+var.set(1)
 
 r = tk.IntVar()
 r.set(1)
@@ -141,11 +145,23 @@ def submitMech(qty):
         print(e)
         exit()
     # determine whether to add or subtract the qty
+    global cleaned
     if v.get() == 1:
         current_qty.set(qty)
+        if var.get() == 1:
+            # update quantity
+            cleaned = False
+        else:
+            # update amount cleaned
+            cleaned = True
     elif v.get() == 2:
         current_qty.set(qty*-1)
-    print(current_qty.get())
+        if var.get() == 1:
+            # update quantity
+            cleaned = False
+        else:
+            # update amount cleaned
+            cleaned = True
     # cableFrame.grid(column=0, row=0)
     mechanicalItemFrame.forget()
     scanItemFrame.grid(column=0, row=0)
@@ -218,6 +234,7 @@ def setupItem(username):
 
 def setupMech():
     # third frame p1
+    clearFrame(scanItemFrame)
     label = tk.Label(mechanicalItemFrame, text='Item: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
     label.grid(column=0, row=0)
     itemLabel = tk.Label(mechanicalItemFrame, text=current_object.name, bg='#F0F8FF', font=('arial', 14, 'normal'))
@@ -236,7 +253,13 @@ def setupMech():
         ('-', 2),
     ]
     for option, val in options:
-        tk.Radiobutton(mechanicalItemFrame, text=option, variable=v, value=val, height=2, width=10).grid(column=2, row=val)
+        tk.Radiobutton(mechanicalItemFrame, text=option, variable=v, value=val, height=4, width=15, font=('arial', 14, 'normal')).grid(column=2, row=val)
+    cleanedOpt = [
+        ('stock', 1),
+        ('cleaned', 2),
+    ]
+    for opt, value in cleanedOpt:
+            tk.Radiobutton(mechanicalItemFrame, text=opt, variable=var, value=value, height=4, width=15).grid(column=3, row=value)
     btn = tk.Button(mechanicalItemFrame, text=' Submit ', command=lambda: submitMech(qtyEntry))
     btn.config(height=2, width=10)
     btn.grid(column=1, row=4)
@@ -316,6 +339,7 @@ def scanItem(username):
 def addQuantity(obj, qty):
     global current_object
     global current_database_qty
+    global current_qty
     current_object = obj
     current_database_qty = qty
     setupMech()  # setup mechanical frame

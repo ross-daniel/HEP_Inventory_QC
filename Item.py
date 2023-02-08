@@ -29,6 +29,19 @@ class Item:
             return 0
         return int(ref.get('qty'))
 
+
+    def getClean(self, ref):
+        ref = ref.child('Mechanical').child(self.name).get()
+        num_cleaned = 0
+        try:
+            num_cleaned = int(ref.get('clean'))
+        except Exception as e:
+            print("Item has not been initialized")
+            print(e)
+            return 0
+        return num_cleaned
+
+
     def updateSpreadSheet(self, qty):
         # TODO: Write a method that automatically updates an inventory spreadsheet
         print("this method is not yet functional")
@@ -68,20 +81,27 @@ class Item:
                 return list(Item.inventory_list[index])
 
     # updates the inventory of the given item by a given quantity
-    def postToDB(self, qty, reference):
+    def postToDB(self, qty, clean, reference):
         ref = reference.child('Mechanical')
         if self.name in ref.get().keys():
             # item already exists in the database
             # find the current quantity of the item
             currQty = self.getQty(reference)
+            currClean = self.getClean(reference)
             if (currQty + int(qty) < int(self.ship_quantity)*2) and currQty >= 2*int(self.ship_quantity):
                 # send automated email to zach if quantity drops below shipment quantity
                 self.sendEmail(currQty + int(qty))
             # update the quantity of the item
-            ref.child(self.name).update({'qty': currQty+qty})
+            if clean:
+                ref.child(self.name).update({'clean': currClean+qty})
+            else:
+                ref.child(self.name).update({'qty': currQty+qty})
         else:
             # item has not yet been added to database
-            ref.child(self.name).update({'qty': qty})
+            if clean:
+                ref.child(self.name).update({'clean': qty})
+            else:
+                ref.child(self.name).update({'qty': qty})
 
     def __init__(self, product_code):
         self.product_code = product_code

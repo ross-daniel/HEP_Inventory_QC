@@ -419,6 +419,7 @@ function submitSearch(){
       }
       console.log('Path: ' + path);
     }
+    //NEED TO AUTHENTICATE OR CHANGE DB RULES FOR THIS TO WORK
     get(child(dbRef, path)).then((snapshot) => {
       console.log(path);
       if (snapshot.exists()) {

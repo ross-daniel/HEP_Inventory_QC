@@ -28,6 +28,8 @@ print(args)
 
 # TODO: Figure Out a way to more easily pass database references to other classes
 
+# TODO: Shift from uploading data to a database and a spreadsheet to just a spreadsheet
+
 #retrieve admin credentials
 cred = credentials.Certificate('hep---dune-firebase-adminsdk-gtwlw-40673207a6.json')
 
@@ -85,38 +87,51 @@ while True:
         print("Shouldn't get here")
     else:
         # Mechanical Item
-
-        # ------ update database ------
         obj = Item(barcode)  # create object
-        qty = gui.addQuantity(obj, obj.getQty(ref))  # display the inventory update screen on the GUI
-        if gui.cleaned:
-            curr_DBqty = obj.getClean(ref)
+        # choose whether to update inventory or QC Docs for the item
+        action = gui.chooseAction()
+        if(action == 0):
+            # ------ update database ------
+            qty = gui.addQuantity(obj, obj.getQty(ref))  # display the inventory update screen on the GUI
+            if gui.cleaned:
+                curr_DBqty = obj.getClean(ref)
+            else:
+                curr_DBqty = obj.getQty(ref)
+            obj.postToDB(qty, gui.cleaned, ref)
+            # -----------------------------
+            # ------ update spreadsheet ------
+            #1jTo9i7WWuXcAUqeUFaboLPtBhbBWiRnmsODXOV0u3-o
+            ssheet = Sheet('1cLLx9eAhPwMRBq-8NWbToL408jOAgZCuEcejaFOKW-k', 'InventorySheet')
+
+            # finds [row, col] for the required cell
+            if gui.cleaned:
+                cell_rep = ssheet.find_cell_rep(barcode, 'Cleaned')
+            else:
+                cell_rep = ssheet.find_cell_rep(barcode, 'Stock')
+
+            curr_qty = ssheet.get_data(cell_rep[0], cell_rep[1])       # finds the current quantity of the item
+            if curr_qty == '':
+                curr_qty = 0
+            else:
+                curr_qty = int(curr_qty)
+            print(f"cell_rep[0]: {cell_rep[0]}")
+            print(f"cell_rep[1]: {cell_rep[1]}")
+            print(f"total quantity: {curr_qty+qty}")
+            ssheet.post_data(cell_rep[0], cell_rep[1], curr_qty+qty)    # updates the spreadsheet
+
+            # make sure the spreadsheet and database show the same value
+            if curr_qty != curr_DBqty:
+                gui.showMessage("Database and Spreadsheet hold different values, please take a count of this item and update the proper location", "INVENTORY INCONSISTENCY")
+
+            # --------------------------------
         else:
-            curr_DBqty = obj.getQty(ref)
-        obj.postToDB(qty, gui.cleaned, ref)
-        # -----------------------------
-        # ------ update spreadsheet ------
-        #1jTo9i7WWuXcAUqeUFaboLPtBhbBWiRnmsODXOV0u3-o
-        ssheet = Sheet('1cLLx9eAhPwMRBq-8NWbToL408jOAgZCuEcejaFOKW-k', 'InventorySheet')
+            # ------ update QC database ------
+            procedures = obj.findQCProcedures()
+            pass_fail = gui.addMechQC(obj, procedures)
+            obj.postQCtoDB(ref, procedures, pass_fail)
+            print(obj.batch_num)
+            # --------------------------------
 
-        # finds [row, col] for the required cell
-        if gui.cleaned:
-            cell_rep = ssheet.find_cell_rep(barcode, 'Cleaned')
-        else:
-            cell_rep = ssheet.find_cell_rep(barcode, 'Stock')
-
-        curr_qty = ssheet.get_data(cell_rep[0], cell_rep[1])       # finds the current quantity of the item
-        if curr_qty == '':
-            curr_qty = 0
-        else:
-            curr_qty = int(curr_qty)
-        ssheet.post_data(cell_rep[0], cell_rep[1], curr_qty+qty)    # updates the spreadsheet
-
-        # make sure the spreadsheet and database show the same value
-        if curr_qty != curr_DBqty:
-            gui.showMessage("Database and Spreadsheet hold different values, please take a count of this item and update the proper location", "INVENTORY INCONSISTENCY")
-
-        # --------------------------------
         # ------ restart the program ------
         sys.argv.append(csuid)  # add the current user to program arguments to keep them signed in
         os.execl(sys.executable, sys.executable, *sys.argv)  # restarts the current program
@@ -124,7 +139,7 @@ while True:
         print("Shouldn't get here")
 
 
-gui.root.mainloop()
+#gui.root.mainloop()
 
 
 

@@ -47,16 +47,25 @@ canvas.grid(columnspan=1, rowspan=1)
 
 
 # global variable to pass to main
-current_entry = tk.StringVar()
-current_csuid = tk.StringVar()
-current_barcode = tk.StringVar()
-current_qty = tk.IntVar()
+current_csuid = tk.StringVar()      # stores the current/most recent csu ID
+current_barcode = tk.StringVar()    # stores the current/most recent item barcode
+current_qty = tk.IntVar()           # stores the current/most recent inventory quantity entered
+current_operation = tk.StringVar()  # stores the current/most recent cable QC operation
+item_action = tk.IntVar()           # stores the item action to be taken (0: update inventory, 1:go to QC doc)
+QC_pass = True                      # stores whether the last QC'd item passed or not
+pass_fail = []                      # stores the result of each QC test
+QC_wait_var = tk.BooleanVar()
+QC_wait_var.set(False)
+
 cleaned = False
-current_operation = tk.StringVar()
 current_object = None
 current_database_qty = 0
 
+
 # variables for radio buttons
+qc_bool = tk.BooleanVar()
+qc_bool.set(True)
+
 v = tk.IntVar()
 v.set(1)
 
@@ -90,6 +99,7 @@ def showMessage(message, title):
     messagebox.showinfo(title, message)
 
 # ---------------------------METHODS FOR SUBMIT BUTTONS ON EACH FRAME-------------------------- #
+
 
 # submit button method for scanID Frame
 def submitID(value):
@@ -137,7 +147,25 @@ def submitItem(code):
         scanItemFrame.forget()
 
 
-def submitMech(qty):
+def submitChoose(choice):
+    global item_action
+    if(choice == 0 or choice == 1):
+        item_action.set(choice)
+    else:
+        item_action.set(0)
+    chooseFrame.forget()
+
+
+def submitMechQC(results, batch, obj):
+    # add QC doc to the database
+    global pass_fail
+    for result in results:
+        pass_fail.append(result.get())
+    obj.batch_num = batch
+    QC_wait_var.set(True)
+
+
+def submitMechInventory(qty):
     # check that a valid qty was entered
     try:
         qty = int(qty.get())
@@ -203,9 +231,9 @@ def submitCable(operation):
 
 def setupScan():
     # first frame
+    scanIDFrame.lift()
     label = tk.Label(scanIDFrame, text='Scan ID or enter ID to continue', bg='#F0F8FF', font=('arial', 14, 'normal'))
     label.grid(column=1, row=0)
-    global current_entry
     current_entry = tk.Entry(scanIDFrame)
     current_entry.grid(column=1, row=1)
     current_entry.focus_force()
@@ -216,6 +244,7 @@ def setupScan():
 
 def setupItem(username):
     # second frame
+    scanItemFrame.lift()
     signedIn = tk.Label(scanItemFrame, text='Signed in as:', bg='#F0F8FF', font=('arial', 14, 'normal'))
     signedIn.grid(column=0,row=0)
     user = tk.Label(scanItemFrame, text=username, bg='#F0F8FF', font=('arial', 14, 'normal'))
@@ -228,13 +257,62 @@ def setupItem(username):
     btn = tk.Button(scanItemFrame, text=' Submit ', command=lambda: submitItem(code.get()))
     btn.config(height=2, width=10)
     btn.grid(column=1, row=3)
-    exitBtn = tk.Button(scanItemFrame, text= ' exit ', command=lambda: exit())
+    exitBtn = tk.Button(scanItemFrame, text=' exit ', command=lambda: exit())
     exitBtn.grid(column=2, row=3)
 
 
-def setupMech():
+def setupChoose():
+    # branch to either inventory update or QC doc
+    chooseFrame.lift()
+    label = tk.Label(chooseFrame, text=' Choose what to do with this Item ', bg='#F0F8FF', font=('arial', 14, 'normal'))
+    label.grid(column=0, row=0)
+    inventory_btn = tk.Button(chooseFrame, text=' Update Inventory ', command=lambda: submitChoose(0))
+    inventory_btn.grid(column=0, row=1)
+    qc_btn = tk.Button(chooseFrame, text=' Update QC Doc ', command=lambda: submitChoose(1))
+    qc_btn.grid(column=0, row=2)
+
+
+def setupMechQC(procedures, obj):
+    mechQCFrame.lift()
+    clearFrame(chooseFrame)
+    results = []
+    for p in procedures:
+        results.append(tk.BooleanVar())
+    if procedures:
+        label = tk.Label(mechQCFrame, text=' Confirm QC Results: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
+        label.grid(column=1, row=0)
+    else:
+        label = tk.Label(mechQCFrame, text=' No QC Required for this Item (Please Exit) ', bg='#F0F8FF', font=('arial', 14, 'normal'))
+        label.grid(column=1, row=0)
+
+    itemLabel = tk.Label(mechQCFrame, text=obj.name, bg='#F0F8FF', font=('arial', 14, 'normal'))
+    itemLabel.grid(column=2, row=0)
+
+    print(procedures)
+    options = [
+        (' Pass ', 1),
+        (' Fail ', 0)
+    ]
+    index = 0
+    for i, procedure in enumerate(procedures):
+        tk.Label(mechQCFrame, text=procedure, bg='#F0F8FF', font=('arial', 14, 'normal')).grid(column=0, row=index+2)
+        for option, val in options:
+            tk.Radiobutton(mechQCFrame, text=option, variable=results[i], value=val, height=4, width=15, font=('arial', 14, 'normal')).grid(column=2, row=index+2)
+            index += 1
+    submit_btn = tk.Button(mechQCFrame, text=' Submit QC Doc ', command=lambda: submitMechQC(results, entry.get(), obj))
+    submit_btn.grid(column=1, row=index+4)
+    exit_btn = tk.Button(mechQCFrame, text=' exit ', command=lambda: exit())
+    exit_btn.grid(column=1, row=index+5)
+    batch_label = tk.Label(mechQCFrame, text=' Batch Number: ')
+    batch_label.grid(column=0, row=index+3)
+    entry = tk.Entry(mechQCFrame)
+    entry.grid(column=1, row=index+3)
+
+
+def setupMechInventory():
     # third frame p1
-    clearFrame(scanItemFrame)
+    mechanicalItemFrame.lift()
+    clearFrame(chooseFrame)
     label = tk.Label(mechanicalItemFrame, text='Item: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
     label.grid(column=0, row=0)
     itemLabel = tk.Label(mechanicalItemFrame, text=current_object.name, bg='#F0F8FF', font=('arial', 14, 'normal'))
@@ -260,7 +338,7 @@ def setupMech():
     ]
     for opt, value in cleanedOpt:
             tk.Radiobutton(mechanicalItemFrame, text=opt, variable=var, value=value, height=4, width=15).grid(column=3, row=value)
-    btn = tk.Button(mechanicalItemFrame, text=' Submit ', command=lambda: submitMech(qtyEntry))
+    btn = tk.Button(mechanicalItemFrame, text=' Submit ', command=lambda: submitMechInventory(qtyEntry))
     btn.config(height=2, width=10)
     btn.grid(column=1, row=4)
     exitBtn = tk.Button(mechanicalItemFrame, text=' exit ', command=lambda: exit())
@@ -270,6 +348,7 @@ def setupMech():
 
 def setupCable(curr_step):
     # third frame p2
+    cableFrame.lift()
     label = tk.Label(cableFrame, text='Cable: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
     label.grid(column=0, row=0)
     cableLabel = tk.Label(cableFrame, text=current_object.name, bg='#F0F8FF', font=('arial', 14, 'normal'))
@@ -304,6 +383,8 @@ scanIDFrame = tk.Frame(root, height=height, width=width)
 scanItemFrame = tk.Frame(root, height=height, width=width)
 mechanicalItemFrame = tk.Frame(root, height=height, width=width)
 cableFrame = tk.Frame(root, height=height, width=width)
+chooseFrame = tk.Frame(root, height=height, width=width)
+mechQCFrame = tk.Frame(root, height=height, width=width)
 
 
 # --------------------STARTING POINTS, CALLED FROM MAIN------------------- #
@@ -312,10 +393,6 @@ cableFrame = tk.Frame(root, height=height, width=width)
 def begin():
     setupScan()  # setup widgets for frame
     scanIDFrame.grid(column=0, row=0)
-    # while keyboard.read_key() == None:
-    #    if(len(current_entry.get())) >= 9:
-    #        submitID(current_entry.get())
-    #        current_entry.set('')
     scanIDFrame.wait_variable(current_csuid)  # wait until user input is submitted
     return current_csuid.get()  # return the user input to the main program
 
@@ -335,6 +412,25 @@ def scanItem(username):
     return current_barcode.get()   # return the barcode to main
 
 
+def chooseAction():
+    global item_action
+    clearFrame(scanItemFrame)
+    setupChoose()
+    chooseFrame.grid(column=0, row=0)
+    chooseFrame.wait_variable(item_action)
+    return item_action.get()
+
+# Show the 'Update Mechanical QC' Frame and wait for user to submit
+def addMechQC(obj, procedures):
+    global pass_fail
+    global QC_wait_var
+    setupMechQC(procedures, obj)
+    mechQCFrame.grid(column=0, row=0)
+    mechQCFrame.wait_variable(QC_wait_var)
+    QC_wait_var = False
+    return pass_fail
+
+
 # Show the 'Mechanical Item' Frame and wait for the user to submit
 def addQuantity(obj, qty):
     global current_object
@@ -342,7 +438,7 @@ def addQuantity(obj, qty):
     global current_qty
     current_object = obj
     current_database_qty = qty
-    setupMech()  # setup mechanical frame
+    setupMechInventory()  # setup mechanical frame
     clearFrame(scanItemFrame)
     mechanicalItemFrame.grid(column=0, row=0)
     mechanicalItemFrame.tkraise()

@@ -19,6 +19,7 @@ import filecmp
 import gui
 import os
 import sys
+import subprocess
 
 # get program arguments, used to keep a user signed in across multiple sessions
 args = sys.argv[1:]

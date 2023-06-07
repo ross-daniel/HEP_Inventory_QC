@@ -241,6 +241,11 @@ def setupScan():
     btn.config(height=2, width=10)
     btn.grid(column=1, row=3)
 
+    def enter(event):
+        submitID(current_entry.get())
+    root.bind('<Return>', enter)
+
+
 
 def setupItem(username):
     # second frame
@@ -259,6 +264,10 @@ def setupItem(username):
     btn.grid(column=1, row=3)
     exitBtn = tk.Button(scanItemFrame, text=' exit ', command=lambda: exit())
     exitBtn.grid(column=2, row=3)
+
+    def enter(event):
+        submitItem(code.get())
+    root.bind('<Return>', enter)
 
 
 def setupChoose():
@@ -308,6 +317,10 @@ def setupMechQC(procedures, obj):
     entry = tk.Entry(mechQCFrame)
     entry.grid(column=1, row=index+3)
 
+    def enter(event):
+        submitMechQC(results, entry.get(), obj)
+    root.bind('<Return>', enter)
+
 
 def setupMechInventory():
     # third frame p1
@@ -345,6 +358,10 @@ def setupMechInventory():
     exitBtn.config(height=2, width=10)
     exitBtn.grid(column=2, row=4)
 
+    def enter(event):
+        submitMechInventory(qtyEntry)
+    root.bind('<Return>', enter)
+
 
 def setupCable(curr_step):
     # third frame p2
@@ -375,6 +392,11 @@ def setupCable(curr_step):
     exitBtn = tk.Button(cableFrame, text=' exit ', command=lambda: exit())
     exitBtn.config(height=2, width=10)
     exitBtn.grid(column=2, row=10)
+
+    def enter(event):
+        print(r.get())
+        submitCable(r.get())
+    root.bind('<Return>', enter)
 
 
 # ----------INITIALIZE FRAMES-------------- #

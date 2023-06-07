@@ -90,7 +90,7 @@ while True:
         obj = Item(barcode)  # create object
         # choose whether to update inventory or QC Docs for the item
         action = gui.chooseAction()
-        if(action == 0):
+        if action == 0:
             # ------ update database ------
             qty = gui.addQuantity(obj, obj.getQty(ref))  # display the inventory update screen on the GUI
             if gui.cleaned:
@@ -100,7 +100,6 @@ while True:
             obj.postToDB(qty, gui.cleaned, ref)
             # -----------------------------
             # ------ update spreadsheet ------
-            #1jTo9i7WWuXcAUqeUFaboLPtBhbBWiRnmsODXOV0u3-o
             ssheet = Sheet('1cLLx9eAhPwMRBq-8NWbToL408jOAgZCuEcejaFOKW-k', 'InventorySheet')
 
             # finds [row, col] for the required cell
@@ -117,8 +116,10 @@ while True:
             print(f"cell_rep[0]: {cell_rep[0]}")
             print(f"cell_rep[1]: {cell_rep[1]}")
             print(f"total quantity: {curr_qty+qty}")
-            ssheet.post_data(cell_rep[0], cell_rep[1], curr_qty+qty)    # updates the spreadsheet
-
+            try:
+                ssheet.post_data(cell_rep[0], cell_rep[1], curr_qty+qty)    # updates the spreadsheet
+            except HttpError as e:
+                print(e)
             # make sure the spreadsheet and database show the same value
             if curr_qty != curr_DBqty:
                 gui.showMessage("Database and Spreadsheet hold different values, please take a count of this item and update the proper location", "INVENTORY INCONSISTENCY")
@@ -140,7 +141,3 @@ while True:
 
 
 #gui.root.mainloop()
-
-
-
-

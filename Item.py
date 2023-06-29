@@ -150,6 +150,10 @@ class Item:
             ref.child('Batch').child(self.batch_num).update({'Total Fails': batch_fails + 1})
         return 0
 
+    # TODO: Write this method to pull data from a csv file
+    def has_qc(self):
+        return False
+
     def __init__(self, product_code):
         self.product_code = product_code
         properties = self.readProductCode()

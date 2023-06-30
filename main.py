@@ -52,7 +52,6 @@ ref = db.reference('')
 # If the barcode sheet has been updated, update the .txt file used for the javascript front-end
 tempFile = convert('Barcode_Sheet_FINAL.csv', 'temp_file.txt')
 if(not filecmp.cmp('temp_file.txt', 'barcode.txt')):
-    print("file converted")
     convert('Barcode_Sheet_FINAL.csv', 'barcode.txt')
 os.remove('temp_file.txt')
 
@@ -79,7 +78,6 @@ if __name__ == "__main__":
     scan_item_frame.pack()  # load the scan item frame
     # wait for user to submit
     barcode = scan_item_frame.item_code.get()
-    print(barcode)
     scan_item_frame.destroy()  # destroy the frame
     # --------------------------------------------------------------------------------------- #
     obj = None
@@ -101,14 +99,30 @@ if __name__ == "__main__":
         choose_action_frame = gui.ChooseAction(gui.root, obj)
         choose_action_frame.pack()
         action = choose_action_frame.action.get()
-        print(action)
         choose_action_frame.destroy()
         if action == 1:
             # ------------------- MECHANICAL QC ----------------------------------------------------- #
             mech_qc_frame = gui.MechQC(gui.root, obj)
             mech_qc_frame.pack()
+            step_num = mech_qc_frame.step.get()
+            step = obj.qc_steps[step_num-1]
+            line_num_list = []
+            for index in range(len(mech_qc_frame.line_items)):
+                if mech_qc_frame.line_items[index].get() == 1:
+                    line_num_list.append(obj.line_numbers[index])
+            passes = mech_qc_frame.passes.get()
+            total_parts = mech_qc_frame.total_parts.get()
+            notes = mech_qc_frame.notes.get()
             batch = mech_qc_frame.batch.get()
-            # --------------------------------------------------------------------------------------- #
+            print(f"Step: {step}")
+            print(f"Line Numbers: {line_num_list}")
+            print(f"Passes: {passes}")
+            print(f"Total Parts: {total_parts}")
+            print(f"Notes: {notes}")
+            print(f"Batch: {batch}")
+            mech_qc_frame.destroy()
+            os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
+        # --------------------------------------------------------------------------------------- #
     # else send them to inventory frame
     # ------------------- INVENTORY --------------------------------------------------------- #
 

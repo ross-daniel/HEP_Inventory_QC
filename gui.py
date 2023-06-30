@@ -49,8 +49,8 @@ def exit():
 def showMessage(message, title):
     messagebox.showinfo(title, message)
 
-# ---------------------setup a canvas----------------------- #
 
+# ---------------------setup a canvas----------------------- #
 
 def set_background(root):
     #make title and set bg
@@ -124,7 +124,6 @@ class SignInFrame(tk.Frame):
     def pack(self):
         super().pack()
         self.wait_variable(self.csuid)
-        print("done waiting")
 
 
 class ScanItemFrame(tk.Frame):
@@ -160,7 +159,6 @@ class ScanItemFrame(tk.Frame):
         # send barcode back to main
         else:
             self.item_code.set(code)
-            print(self.item_code.get())
 
     def pack(self):
         super().pack()
@@ -276,7 +274,7 @@ class MechQC(tk.Frame):
         self.step = tk.IntVar()
         self.line_items = []
         for i in range(4):
-            self.line_items.append(tk.IntVar)
+            self.line_items.append(tk.IntVar())
         self.passes = tk.IntVar()
         self.total_parts = tk.IntVar()
         self.notes = tk.StringVar()
@@ -298,7 +296,7 @@ class MechQC(tk.Frame):
         notes_entry = tk.Entry(self)
         batch_entry = tk.Entry(self)
 
-        submit_button = tk.Button(self, text=' Submit ', command=lambda: self.submitMechQC())
+        submit_button = tk.Button(self, text=' Submit ', command=lambda: self.submitMechQC(passes_entry.get(), total_parts_entry.get(), notes_entry.get(), batch_entry.get()))
 
         i = 0
         for line_num in item.line_numbers:
@@ -327,8 +325,11 @@ class MechQC(tk.Frame):
         batch_entry.grid(row=4, column=3)
         submit_button.grid(row=5, column=2, columnspan=2, sticky=tk.W+tk.E)
 
-    def submitMechQC(self):
-        return None
+    def submitMechQC(self, passes_, total_parts_, notes_, batch_):
+        self.passes.set(passes_)
+        self.total_parts.set(total_parts_)
+        self.notes.set(notes_)
+        self.batch.set(batch_)
 
     def pack(self):
         super().pack()

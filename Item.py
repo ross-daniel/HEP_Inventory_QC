@@ -17,7 +17,7 @@ class Item:
     file = 'Barcode_Sheet_FINAL.csv'
     mechFile = open(file, 'r')
     inventory_list = list(csv.reader(mechFile))
-    qc_table = open('parts_to_QC.csv', 'r')
+    qc_table = open('MechQC_Steps.csv', 'r')
     qc_list = list(csv.reader(qc_table))
 
     # gets the current quantity of self in the DB
@@ -150,9 +150,25 @@ class Item:
             ref.child('Batch').child(self.batch_num).update({'Total Fails': batch_fails + 1})
         return 0
 
-    # TODO: Write this method to pull data from a csv file
-    def has_qc(self):
-        return False
+    def has_qc_form(self):
+        if len(self.qc_steps) > 0:
+            return True
+        else:
+            return False
+
+    def get_qc_steps(self):
+        qc_steps_list = []
+        for part_list in Item.qc_list:  # iterate through all rows of the spreadsheet
+            if part_list[1] == self.name:  # check the second column of each row until a matching part description is found
+                qc_steps_list = part_list[3:7]  # save the qc steps into a new array
+                self.line_numbers = part_list[2].split(",")  # grab line number while here
+                index = 3
+                for qc_step in qc_steps_list:  # iterate through the newly created list
+                    if qc_step == 'x':
+                        qc_steps_list[index] = Item.qc_list[0][index]  # if the cell has an 'x' replace it with the corresponding qc step
+                    index +=1
+                qc_steps_list = [i for i in qc_steps_list if i != '-']  # remove all steps not included for the part
+        return qc_steps_list  # should return something like: ['Dimension Check', 'Deburr / Deglue', 'Bag and Label']
 
     def __init__(self, product_code):
         self.product_code = product_code
@@ -160,7 +176,10 @@ class Item:
         self.name = properties[2]
         print(self.name)
         self.line_number = properties[1]
+        self.line_numbers = []
         self.part_number = properties[3]
         self.ship_quantity = properties[4]
         self.distributor = properties[5]
-        self.batch_num = "001"
+        self.qc_steps = self.get_qc_steps()
+        print(self.qc_steps)
+        self.has_qc = True

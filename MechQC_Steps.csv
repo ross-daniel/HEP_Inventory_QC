@@ -1,7 +1,7 @@
 Barcode,Item Description,Line Numbers,Dimension Check,CNC / Shopwork,Deburr / Deglue,Bag and Label,,Legend:
 40000yyy012x,Far Side Guide Rails (Long),"12,48",x,x,x,x,,x : requires qc process
 40000yyy019x,Readout Side Guide Rails (Short),"19,55",x,x,x,x,,- : does not require qc process
-40000yyy002x,Cable Containment Bracket,2,x,-,-,x,,
+40000yyy002x,CABLE CONTAINMENT BRACKET,2,x,-,-,x,,
 40000yyy003x,M5x52mm Threaded Vented Hex Standoffs,3,x,x,-,x,,
 40000yyy013x,Stainless Steel(SS) Mount Angles,"13,20,49,56",x,-,-,x,,
 40000yyy028x,Stainless Steel Mount Plates,"28,64",x,x,x,x,,

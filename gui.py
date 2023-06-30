@@ -266,3 +266,70 @@ class ChooseAction(tk.Frame):
     def pack(self):
         super().pack()
         self.wait_variable(self.action)
+
+
+class MechQC(tk.Frame):
+    def __init__(self, parent, item):
+
+        qc_steps = item.qc_steps
+
+        self.step = tk.IntVar()
+        self.line_items = []
+        for i in range(4):
+            self.line_items.append(tk.IntVar)
+        self.passes = tk.IntVar()
+        self.total_parts = tk.IntVar()
+        self.notes = tk.StringVar()
+        self.batch = tk.StringVar()
+
+        super().__init__(master=parent)
+
+        form_label = tk.Label(self, text=' QC Form: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
+        part_label = tk.Label(self, text=item.name, bg='#F0F8FF', font=('arial', 14, 'normal'))
+        step_label = tk.Label(self, text=' Current Step: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
+        passes_label = tk.Label(self, text=' passes: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
+        total_parts_label = tk.Label(self, text=' total parts: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
+        line_item_label = tk.Label(self, text=' Line Number(s): ', bg='#F0F8FF', font=('arial', 14, 'normal'))
+        notes_label = tk.Label(self, text=' notes: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
+        batch_label = tk.Label(self, text=' batch: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
+
+        passes_entry = tk.Entry(self)
+        total_parts_entry = tk.Entry(self)
+        notes_entry = tk.Entry(self)
+        batch_entry = tk.Entry(self)
+
+        submit_button = tk.Button(self, text=' Submit ', command=lambda: self.submitMechQC())
+
+        i = 0
+        for line_num in item.line_numbers:
+            tk.Checkbutton(self, text=line_num, variable=self.line_items[i], onvalue=1, offvalue=0).grid(row=2, column=i+2)
+            i += 1
+
+        options = []
+        index = 1
+        for step in qc_steps:
+            options.append((step, index))
+            index += 1
+        for option, val in options:
+            tk.Radiobutton(self, text=option, variable=self.step, value=val).grid(column=val+1, row=1)
+
+        form_label.grid(row=0, column=2)
+        part_label.grid(row=0, column=3)
+        step_label.grid(row=1, column=1)
+        passes_label.grid(row=2, column=0)
+        total_parts_label.grid(row=3, column=1)
+        line_item_label.grid(row=2, column=3, columnspan=2, sticky=tk.W+tk.E)
+        notes_label.grid(row=3, column=3)
+        batch_label.grid(row=4, column=2)
+        passes_entry.grid(row=2, column=1)
+        total_parts_entry.grid(row=3, column=2)
+        notes_entry.grid(row=3, column=4)
+        batch_entry.grid(row=4, column=3)
+        submit_button.grid(row=5, column=2, columnspan=2, sticky=tk.W+tk.E)
+
+    def submitMechQC(self):
+        return None
+
+    def pack(self):
+        super().pack()
+        self.wait_variable(self.batch)

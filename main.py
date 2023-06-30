@@ -96,18 +96,24 @@ if __name__ == "__main__":
     obj = Item(barcode)
     # decide whether the scanned item has a QC form or not
 
-    if obj.has_qc():
-        print("got here")
-    # if so, send the user to the choose action page
-    choose_action_frame = gui.ChooseAction(gui.root, obj)
-    choose_action_frame.pack()
-    action = choose_action_frame.action.get()
-    print(action)
-    # else send them straight to inventory frame
+    if obj.has_qc:
+        # if so, send the user to the choose action page
+        choose_action_frame = gui.ChooseAction(gui.root, obj)
+        choose_action_frame.pack()
+        action = choose_action_frame.action.get()
+        print(action)
+        choose_action_frame.destroy()
+        if action == 1:
+            # ------------------- MECHANICAL QC ----------------------------------------------------- #
+            mech_qc_frame = gui.MechQC(gui.root, obj)
+            mech_qc_frame.pack()
+            batch = mech_qc_frame.batch.get()
+            # --------------------------------------------------------------------------------------- #
+    # else send them to inventory frame
     # ------------------- INVENTORY --------------------------------------------------------- #
+
     # --------------------------------------------------------------------------------------- #
-    # ------------------- MECHANICAL QC ----------------------------------------------------- #
-    # --------------------------------------------------------------------------------------- #
+
     # --------------------------------------------------------------------------------------- #
 
     gui.root.mainloop()

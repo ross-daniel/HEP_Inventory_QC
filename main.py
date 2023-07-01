@@ -46,7 +46,7 @@ ref = db.reference('')
 # -------------MISC SETUP------------ #
 # makes sure important external files are configured properly
 
-# TODO: Check if GitHub Repo has been updated, if so, clone repo
+# TODO: Check if GitHub Repo has been updated, if so, prompt user to update
 
 # Check Barcode Sheet
 # If the barcode sheet has been updated, update the .txt file used for the javascript front-end
@@ -121,11 +121,20 @@ if __name__ == "__main__":
             print(f"Notes: {notes}")
             print(f"Batch: {batch}")
             mech_qc_frame.destroy()
+            # post QC to DB
+            obj.postQCtoDB(ref, batch, step, passes, total_parts, line_num_list, notes)
             os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
         # --------------------------------------------------------------------------------------- #
     # else send them to inventory frame
     # ------------------- INVENTORY --------------------------------------------------------- #
-
+    inventory_frame = gui.MechInventoryFrame(gui.root, obj)
+    inventory_frame.pack()
+    qty = inventory_frame.quantity.get()
+    if inventory_frame.sign.get() == 1:
+        qty = qty*-1
+    inventory_frame.destroy()
+    obj.postToDB(qty, False, ref)
+    os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
     # --------------------------------------------------------------------------------------- #
 
     # --------------------------------------------------------------------------------------- #

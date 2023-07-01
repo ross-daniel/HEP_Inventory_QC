@@ -334,3 +334,32 @@ class MechQC(tk.Frame):
     def pack(self):
         super().pack()
         self.wait_variable(self.batch)
+
+class MechInventoryFrame(tk.Frame):
+    def __init__(self, parent, item):
+
+        self.quantity = tk.IntVar()
+        self.sign = tk.IntVar()
+
+        super().__init__(master=parent)
+
+        label = tk.Label(self, text=' Update Item Inventory: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
+        item_label = tk.Label(self, text=item.name, bg='#F0F8FF', font=('arial', 14, 'normal'))
+        qty_entry = tk.Entry(self)
+        options = ['+', '-']
+        submit_btn = tk.Button(self, text=' Submit ', command=lambda: self.submitInventory(qty_entry.get()))
+
+        for index, opt in enumerate(options):
+            tk.Radiobutton(self, text=opt, variable=self.sign, val=index).grid(row=1+index, column=1)
+
+        label.grid(row=0, column=0)
+        item_label.grid(row=0, column=1)
+        qty_entry.grid(row=2, column=0)
+        submit_btn.grid(row=4, column=1)
+
+    def submitInventory(self, qty):
+        self.quantity.set(qty)
+
+    def pack(self):
+        super().pack()
+        self.wait_variable(self.quantity)

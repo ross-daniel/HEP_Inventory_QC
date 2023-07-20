@@ -66,6 +66,7 @@ if __name__ == "__main__":
         # load first page of gui, asks for an ID to be scanned
         scan_id_frame = gui.SignInFrame(gui.root)  # create the frame
         scan_id_frame.pack()  # load the frame
+        scan_id_frame.lift()
         csuid = scan_id_frame.csuid.get()
         employee = Student(csuid, ref)  # create a Student object with the entered csuid
         scan_id_frame.destroy()  # destroy the ID frame
@@ -88,6 +89,7 @@ if __name__ == "__main__":
         cable_traveler_frame.pack()  # load cable frame
         cable_step = cable_traveler_frame.cable_step.get()  # grab user input
         obj.postToDB(cable_step, employee.name, ref)  # post traveler step to DB
+        sys.argv.append(csuid)
         os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
     # --------------------------------------------------------------------------------------- #
     # ------------------- MECHANICAL -------------------------------------------------------- #
@@ -107,15 +109,15 @@ if __name__ == "__main__":
             step_num = mech_qc_frame.step.get()
             step = obj.qc_steps[step_num-1]
             line_num_list = []
-            for index in range(len(mech_qc_frame.line_items)):
-                if mech_qc_frame.line_items[index].get() == 1:
-                    line_num_list.append(obj.line_numbers[index])
+            #for index in range(len(mech_qc_frame.line_items)):
+            #    if mech_qc_frame.line_items[index].get() == 1:
+            #        line_num_list.append(obj.line_numbers[index])
             passes = mech_qc_frame.passes.get()
             total_parts = mech_qc_frame.total_parts.get()
             notes = mech_qc_frame.notes.get()
             batch = mech_qc_frame.batch.get()
             print(f"Step: {step}")
-            print(f"Line Numbers: {line_num_list}")
+            #print(f"Line Numbers: {line_num_list}")
             print(f"Passes: {passes}")
             print(f"Total Parts: {total_parts}")
             print(f"Notes: {notes}")
@@ -123,6 +125,7 @@ if __name__ == "__main__":
             mech_qc_frame.destroy()
             # post QC to DB
             obj.postQCtoDB(ref, batch, step, passes, total_parts, line_num_list, notes)
+            sys.argv.append(csuid)
             os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
         # --------------------------------------------------------------------------------------- #
     # else send them to inventory frame
@@ -134,6 +137,7 @@ if __name__ == "__main__":
         qty = qty*-1
     inventory_frame.destroy()
     obj.postToDB(qty, False, ref)
+    sys.argv.append(csuid)
     os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
     # --------------------------------------------------------------------------------------- #
 

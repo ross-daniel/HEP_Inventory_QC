@@ -9,6 +9,9 @@
 #--------------------------------------------------------------------------------------------
 
 import csv
+import sheet
+import gui
+from googleapiclient.errors import HttpError
 #import yagmail
 
 
@@ -80,6 +83,7 @@ class Item:
     # updates the inventory of the given item by a given quantity
     def postToDB(self, qty, clean, reference):
         ref = reference.child('Mechanical')
+        ssheet = sheet.Sheet('1cLLx9eAhPwMRBq-8NWbToL408jOAgZCuEcejaFOKW-k', 'InventorySheet')
         if self.name in ref.get().keys():
             # item already exists in the database
             # find the current quantity of the item
@@ -100,9 +104,27 @@ class Item:
             else:
                 ref.child(self.name).update({'qty': qty})
 
+        # ----------- update spreadsheet -------------------- #
+        cell_rep = ssheet.find_cell_rep(self.product_code, 'Stock')
+        curr_qty = ssheet.get_data(cell_rep[0], cell_rep[1])       # finds the current quantity of the item
+        if curr_qty == '':
+            curr_qty = 0
+        else:
+            curr_qty = int(curr_qty)
+        print(f"cell_rep[0]: {cell_rep[0]}")
+        print(f"cell_rep[1]: {cell_rep[1]}")
+        print(f"total quantity: {curr_qty+qty}")
+        try:
+            ssheet.post_data(cell_rep[0], cell_rep[1], curr_qty+qty)    # updates the spreadsheet
+        except HttpError as e:
+            print(e)
+        # make sure the spreadsheet and database show the same value
+        if curr_qty != currQty:
+            gui.showMessage("Database and Spreadsheet hold different values, please take a count of this item and update the proper location", "INVENTORY INCONSISTENCY")
+
     # adds the QC doc to the database
     def postQCtoDB(self, ref, batch_num, qc_step, passes, total_parts, line_items, notes):
-        ref = ref.child(self.name).child(batch_num).child(qc_step)
+        ref = ref.child('Mechanical QC Docs').child(self.name).child(batch_num).child(qc_step)
         ref.update({'passes': passes})
         ref.update({'total parts': total_parts})
         ref.update({'notes': notes})

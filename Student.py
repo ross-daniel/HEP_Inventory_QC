@@ -11,6 +11,7 @@ class Student:
     def __init__(self, csuid, ref):
         self.csuid = csuid
         self.users = ref.child('users').get()
+        self.name = ""
         # Search the database for the given ID number
         for key in self.users:
             if key == self.csuid:

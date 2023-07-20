@@ -9,6 +9,9 @@
 #--------------------------------------------------------------------------------------------
 
 import csv
+import sheet
+import gui
+from googleapiclient.errors import HttpError
 #import yagmail
 
 
@@ -17,7 +20,7 @@ class Item:
     file = 'Barcode_Sheet_FINAL.csv'
     mechFile = open(file, 'r')
     inventory_list = list(csv.reader(mechFile))
-    qc_table = open('parts_to_QC.csv', 'r')
+    qc_table = open('MechQC_Steps.csv', 'r')
     qc_list = list(csv.reader(qc_table))
 
     # gets the current quantity of self in the DB
@@ -31,7 +34,6 @@ class Item:
             return 0
         return int(ref.get('qty'))
 
-
     def getClean(self, ref):
         ref = ref.child('Mechanical').child(self.name).get()
         num_cleaned = 0
@@ -42,11 +44,6 @@ class Item:
             print(e)
             return 0
         return num_cleaned
-
-
-    def updateSpreadSheet(self, qty):
-        # TODO: Write a method that automatically updates an inventory spreadsheet
-        print("this method is not yet functional")
 
     # sends an automated email to Zach Rautio when an items stock reaches a low quantity
     def sendEmail(self, stock):
@@ -79,12 +76,14 @@ class Item:
         print(target)
         for index, item in enumerate(Item.inventory_list):
             if target in item[0]:
+                self.product_code = item[0]  # make barcode exactly as it appears in the sheet
                 print(Item.inventory_list[index])
                 return list(Item.inventory_list[index])
 
     # updates the inventory of the given item by a given quantity
     def postToDB(self, qty, clean, reference):
         ref = reference.child('Mechanical')
+        ssheet = sheet.Sheet('1cLLx9eAhPwMRBq-8NWbToL408jOAgZCuEcejaFOKW-k', 'InventorySheet')
         if self.name in ref.get().keys():
             # item already exists in the database
             # find the current quantity of the item
@@ -105,50 +104,50 @@ class Item:
             else:
                 ref.child(self.name).update({'qty': qty})
 
-    # returns an array with all the procedures for the particular item
-    def findQCProcedures(self):
-        qc_procedures = []
-        for i, row in enumerate(Item.qc_list):
-            if self.name in row[0]:
-                for index, cell_val in enumerate(row):
-                    if index > 1 and len(cell_val) > 0:
-                        qc_procedures.append(cell_val)
-        return qc_procedures
+        # ----------- update spreadsheet -------------------- #
+        cell_rep = ssheet.find_cell_rep(self.product_code, 'Stock')
+        curr_qty = ssheet.get_data(cell_rep[0], cell_rep[1])       # finds the current quantity of the item
+        if curr_qty == '':
+            curr_qty = 0
+        else:
+            curr_qty = int(curr_qty)
+        print(f"cell_rep[0]: {cell_rep[0]}")
+        print(f"cell_rep[1]: {cell_rep[1]}")
+        print(f"total quantity: {curr_qty+qty}")
+        try:
+            ssheet.post_data(cell_rep[0], cell_rep[1], curr_qty+qty)    # updates the spreadsheet
+        except HttpError as e:
+            print(e)
+        # make sure the spreadsheet and database show the same value
+        if curr_qty != currQty:
+            gui.showMessage("Database and Spreadsheet hold different values, please take a count of this item and update the proper location", "INVENTORY INCONSISTENCY")
 
     # adds the QC doc to the database
-    def postQCtoDB(self, reference, procedures, pass_fail):
-        ref = reference.child('Mechanical').child(self.name)
-        total_passes = 0
-        for i, procedure in enumerate(procedures):
-            curr_ref = ref.child('Batch').child(self.batch_num).child(procedure)
-            result = 0
-            if pass_fail[i] == True:
-                result = 1
-                total_passes += 1
-            try:
-                curr_passes = int(curr_ref.get('passes')[0]['passes'])
-            except Exception as e:
-                print(e)
-                curr_passes = 0
-            curr_ref.update({'passes': curr_passes+result})
-        try:
-            batch_passes = int(ref.child('Batch').child(self.batch_num).get('Total Passes')[0]['Total Passes'])
-        except Exception as e:
-            print(e)
-            batch_passes = 0
-        print(f"Batch Passes: {batch_passes}")
-        try:
-            batch_fails = int(ref.child('Batch').child(self.batch_num).get('Total Fails')[0]['Total Fails'])
-        except Exception as e:
-            print(e)
-            batch_fails = 0
-        if total_passes == len(pass_fail):
-            # add to the total number of passes in the batch
-            ref.child('Batch').child(self.batch_num).update({'Total Passes': batch_passes + 1})
+    def postQCtoDB(self, ref, batch_num, qc_step, passes, total_parts, line_items, notes):
+        ref = ref.child('Mechanical QC Docs').child(self.name).child(batch_num).child(qc_step)
+        ref.update({'passes': passes})
+        ref.update({'total parts': total_parts})
+        ref.update({'notes': notes})
+
+    def has_qc_form(self):
+        if len(self.qc_steps) > 0:
+            return True
         else:
-            # add to total number of fails
-            ref.child('Batch').child(self.batch_num).update({'Total Fails': batch_fails + 1})
-        return 0
+            return False
+
+    def get_qc_steps(self):
+        qc_steps_list = []
+        for part_list in Item.qc_list:  # iterate through all rows of the spreadsheet
+            if part_list[0] == self.product_code:  # check the second column of each row until a matching part description is found
+                qc_steps_list = part_list[3:7]  # save the qc steps into a new array
+                self.line_numbers = part_list[2].split(",")  # grab line number while here
+                index = 3
+                for qc_step in qc_steps_list:  # iterate through the newly created list
+                    if qc_step == 'x':
+                        qc_steps_list[index-3] = Item.qc_list[0][index]  # if the cell has an 'x' replace it with the corresponding qc step
+                    index += 1
+                qc_steps_list = [i for i in qc_steps_list if i != '-']  # remove all steps not included for the part
+        return qc_steps_list  # should return something like: ['Dimension Check', 'Deburr / Deglue', 'Bag and Label']
 
     def __init__(self, product_code):
         self.product_code = product_code
@@ -156,7 +155,10 @@ class Item:
         self.name = properties[2]
         print(self.name)
         self.line_number = properties[1]
+        self.line_numbers = []
         self.part_number = properties[3]
         self.ship_quantity = properties[4]
         self.distributor = properties[5]
-        self.batch_num = "001"
+        self.qc_steps = self.get_qc_steps()
+        print(self.qc_steps)
+        self.has_qc = True

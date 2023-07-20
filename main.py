@@ -20,6 +20,7 @@ import gui
 import os
 import sys
 import subprocess
+import time
 
 # get program arguments, used to keep a user signed in across multiple sessions
 args = sys.argv[1:]
@@ -45,100 +46,101 @@ ref = db.reference('')
 # -------------MISC SETUP------------ #
 # makes sure important external files are configured properly
 
-# TODO: Check if GitHub Repo has been updated, if so, clone repo
+# TODO: Check if GitHub Repo has been updated, if so, prompt user to update
 
 # Check Barcode Sheet
 # If the barcode sheet has been updated, update the .txt file used for the javascript front-end
 tempFile = convert('Barcode_Sheet_FINAL.csv', 'temp_file.txt')
 if(not filecmp.cmp('temp_file.txt', 'barcode.txt')):
-    print("file converted")
     convert('Barcode_Sheet_FINAL.csv', 'barcode.txt')
 os.remove('temp_file.txt')
 
 
 # -------GUI CONTROL FLOW------- #
 
+if __name__ == "__main__":
 
-# if the user is not already signed in, prompt them to sign in
-if(not len(args) > 0):
-    # load first page of gui, asks for an ID to be scanned
-    csuid = gui.begin()
-    # create a student object from the csuid
-    student = Student(csuid, ref)
-    # find the students name
-    username = student.name
-# if user is already signed in, set the current Student object to the correct user
-else:
-    student = Student(args[-1], ref)
-    csuid = student.csuid
-    username = student.name
-while True:
-    # load second page of gui, asks for an item to be scanned
-    barcode = gui.scanItem(username)
-    obj = None  # initialize an object, used to pass either a cable or item object to gui.py
-
-    # detect whether the barcode refers to a Cable or Mechanical Item
-    if int(barcode[0]) < 4:
-        # Cable
-        obj = Cable(int(barcode))  # create object
-        op = gui.addCableQC(obj, ref)  # display the cable QC form on the GUI
-        obj.postToDB(op, username, ref)  # call the post to DB method of the cable class
-        sys.argv.append(csuid)  # add the current user to program arguments to keep them signed in
-        os.execl(sys.executable, sys.executable, *sys.argv)  # restarts the current program
-        print("Shouldn't get here")
+    # --------------- SIGN IN PAGE --------------------------------------------------------- #
+    # if the user is not already signed in, prompt them to sign in
+    if not len(args) > 0:
+        # load first page of gui, asks for an ID to be scanned
+        scan_id_frame = gui.SignInFrame(gui.root)  # create the frame
+        scan_id_frame.pack()  # load the frame
+        scan_id_frame.lift()
+        csuid = scan_id_frame.csuid.get()
+        employee = Student(csuid, ref)  # create a Student object with the entered csuid
+        scan_id_frame.destroy()  # destroy the ID frame
+    # if user is already signed in, set the current Student object to the correct user
     else:
-        # Mechanical Item
-        obj = Item(barcode)  # create object
-        # choose whether to update inventory or QC Docs for the item
-        action = gui.chooseAction()
-        if action == 0:
-            # ------ update database ------
-            qty = gui.addQuantity(obj, obj.getQty(ref))  # display the inventory update screen on the GUI
-            if gui.cleaned:
-                curr_DBqty = obj.getClean(ref)
-            else:
-                curr_DBqty = obj.getQty(ref)
-            obj.postToDB(qty, gui.cleaned, ref)
-            # -----------------------------
-            # ------ update spreadsheet ------
-            ssheet = Sheet('1cLLx9eAhPwMRBq-8NWbToL408jOAgZCuEcejaFOKW-k', 'InventorySheet')
+        employee = Student(args[-1], ref)
+    # --------------------------------------------------------------------------------------- #
+    # ------------------ SCAN ITEM PAGE ----------------------------------------------------- #
+    scan_item_frame = gui.ScanItemFrame(gui.root, employee.name)  # create the scan item frame
+    scan_item_frame.pack()  # load the scan item frame
+    # wait for user to submit
+    barcode = scan_item_frame.item_code.get()
+    scan_item_frame.destroy()  # destroy the frame
+    # --------------------------------------------------------------------------------------- #
+    obj = None
+    # ------------------- ELECTRICAL -------------------------------------------------------- #
+    if int(barcode[0]) < 4:
+        obj = Cable(int(barcode))
+        cable_traveler_frame = gui.CableTraveler(gui.root, obj, obj.find_step(ref))  # create cable frame
+        cable_traveler_frame.pack()  # load cable frame
+        cable_step = cable_traveler_frame.cable_step.get()  # grab user input
+        obj.postToDB(cable_step, employee.name, ref)  # post traveler step to DB
+        sys.argv.append(csuid)
+        os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
+    # --------------------------------------------------------------------------------------- #
+    # ------------------- MECHANICAL -------------------------------------------------------- #
+    obj = Item(barcode)
+    # decide whether the scanned item has a QC form or not
 
-            # finds [row, col] for the required cell
-            if gui.cleaned:
-                cell_rep = ssheet.find_cell_rep(barcode, 'Cleaned')
-            else:
-                cell_rep = ssheet.find_cell_rep(barcode, 'Stock')
+    if obj.has_qc:
+        # if so, send the user to the choose action page
+        choose_action_frame = gui.ChooseAction(gui.root, obj)
+        choose_action_frame.pack()
+        action = choose_action_frame.action.get()
+        choose_action_frame.destroy()
+        if action == 1:
+            # ------------------- MECHANICAL QC ----------------------------------------------------- #
+            mech_qc_frame = gui.MechQC(gui.root, obj)
+            mech_qc_frame.pack()
+            step_num = mech_qc_frame.step.get()
+            step = obj.qc_steps[step_num-1]
+            line_num_list = []
+            #for index in range(len(mech_qc_frame.line_items)):
+            #    if mech_qc_frame.line_items[index].get() == 1:
+            #        line_num_list.append(obj.line_numbers[index])
+            passes = mech_qc_frame.passes.get()
+            total_parts = mech_qc_frame.total_parts.get()
+            notes = mech_qc_frame.notes.get()
+            batch = mech_qc_frame.batch.get()
+            print(f"Step: {step}")
+            #print(f"Line Numbers: {line_num_list}")
+            print(f"Passes: {passes}")
+            print(f"Total Parts: {total_parts}")
+            print(f"Notes: {notes}")
+            print(f"Batch: {batch}")
+            mech_qc_frame.destroy()
+            # post QC to DB
+            obj.postQCtoDB(ref, batch, step, passes, total_parts, line_num_list, notes)
+            sys.argv.append(csuid)
+            os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
+        # --------------------------------------------------------------------------------------- #
+    # else send them to inventory frame
+    # ------------------- INVENTORY --------------------------------------------------------- #
+    inventory_frame = gui.MechInventoryFrame(gui.root, obj)
+    inventory_frame.pack()
+    qty = inventory_frame.quantity.get()
+    if inventory_frame.sign.get() == 1:
+        qty = qty*-1
+    inventory_frame.destroy()
+    obj.postToDB(qty, False, ref)
+    sys.argv.append(csuid)
+    os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
+    # --------------------------------------------------------------------------------------- #
 
-            curr_qty = ssheet.get_data(cell_rep[0], cell_rep[1])       # finds the current quantity of the item
-            if curr_qty == '':
-                curr_qty = 0
-            else:
-                curr_qty = int(curr_qty)
-            print(f"cell_rep[0]: {cell_rep[0]}")
-            print(f"cell_rep[1]: {cell_rep[1]}")
-            print(f"total quantity: {curr_qty+qty}")
-            try:
-                ssheet.post_data(cell_rep[0], cell_rep[1], curr_qty+qty)    # updates the spreadsheet
-            except HttpError as e:
-                print(e)
-            # make sure the spreadsheet and database show the same value
-            if curr_qty != curr_DBqty:
-                gui.showMessage("Database and Spreadsheet hold different values, please take a count of this item and update the proper location", "INVENTORY INCONSISTENCY")
+    # --------------------------------------------------------------------------------------- #
 
-            # --------------------------------
-        else:
-            # ------ update QC database ------
-            procedures = obj.findQCProcedures()
-            pass_fail = gui.addMechQC(obj, procedures)
-            obj.postQCtoDB(ref, procedures, pass_fail)
-            print(obj.batch_num)
-            # --------------------------------
-
-        # ------ restart the program ------
-        sys.argv.append(csuid)  # add the current user to program arguments to keep them signed in
-        os.execl(sys.executable, sys.executable, *sys.argv)  # restarts the current program
-        # ---------------------------------
-        print("Shouldn't get here")
-
-
-#gui.root.mainloop()
+    gui.root.mainloop()

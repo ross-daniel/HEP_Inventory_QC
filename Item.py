@@ -160,5 +160,10 @@ class Item:
         self.ship_quantity = properties[4]
         self.distributor = properties[5]
         self.qc_steps = self.get_qc_steps()
-        print(self.qc_steps)
-        self.has_qc = True
+        self.has_qc = self.has_qc_form()
+        # if ref is not None:
+        #    self.ref = ref
+        #    self.current_quantity = self.getQty(ref)
+        #else:
+        #    self.ref = None
+        #    self.current_quantity = None

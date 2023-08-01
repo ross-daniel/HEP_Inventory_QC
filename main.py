@@ -34,7 +34,6 @@ print(args)
 
 #retrieve admin credentials
 cred = credentials.Certificate('hep---dune-firebase-adminsdk-gtwlw-40673207a6.json')
-
 # Initialize the app with a service account, granting admin privileges
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://hep---dune-default-rtdb.firebaseio.com'
@@ -73,6 +72,7 @@ if __name__ == "__main__":
     # if user is already signed in, set the current Student object to the correct user
     else:
         employee = Student(args[-1], ref)
+        csuid = employee.csuid
     # --------------------------------------------------------------------------------------- #
     # ------------------ SCAN ITEM PAGE ----------------------------------------------------- #
     scan_item_frame = gui.ScanItemFrame(gui.root, employee.name)  # create the scan item frame
@@ -93,6 +93,7 @@ if __name__ == "__main__":
         os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
     # --------------------------------------------------------------------------------------- #
     # ------------------- MECHANICAL -------------------------------------------------------- #
+    print(ref.child('Mechanical'))
     obj = Item(barcode)
     # decide whether the scanned item has a QC form or not
 
@@ -130,7 +131,8 @@ if __name__ == "__main__":
         # --------------------------------------------------------------------------------------- #
     # else send them to inventory frame
     # ------------------- INVENTORY --------------------------------------------------------- #
-    inventory_frame = gui.MechInventoryFrame(gui.root, obj)
+    curr_qty = obj.getQty(ref)  # temporary (hopefully)
+    inventory_frame = gui.MechInventoryFrame(gui.root, obj, curr_qty)
     inventory_frame.pack()
     qty = inventory_frame.quantity.get()
     if inventory_frame.sign.get() == 1:

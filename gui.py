@@ -325,7 +325,7 @@ class MechQC(tk.Frame):
 
 
 class MechInventoryFrame(tk.Frame):
-    def __init__(self, parent, item):
+    def __init__(self, parent, item, curr_qty):
 
         self.quantity = tk.IntVar()
         self.sign = tk.IntVar()
@@ -333,6 +333,7 @@ class MechInventoryFrame(tk.Frame):
         super().__init__(master=parent)
 
         label = tk.Label(self, text=' Update Item Inventory: ')
+        curr_qty_label = tk.Label(self, text=f" Current Quantity: {curr_qty}")
         item_label = tk.Label(self, text=item.name)
         qty_entry = tk.Entry(self)
         options = ['+', '-']
@@ -343,6 +344,7 @@ class MechInventoryFrame(tk.Frame):
 
         label.grid(row=0, column=0, padx=20, pady=20)
         item_label.grid(row=0, column=1, padx=20, pady=20)
+        curr_qty_label.grid(row=1, column=0, padx=20, pady=20)
         qty_entry.grid(row=2, column=0, padx=20, pady=20)
         submit_btn.grid(row=4, column=1, padx=20, pady=20)
 

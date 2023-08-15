@@ -3,7 +3,7 @@
 #       Graphical User Interface for CSU HEP Lab Inventory System
 #
 #             created by: Ross Stauder and Nikola Durand
-#                           rev: July 2022
+#                           rev: July 2023
 #             DUNE - Deep Underground Neutrino Experiment
 # --------------------------------------------------------------------------------------------
 
@@ -12,8 +12,8 @@
 #  Submit methods decide what values need to be fetched and fetch them for the starting point to return to main
 
 # TODO: Make Everything Look Nicer
-# TODO: Add Mechanical QC Methods and Frames
 # TODO: Add SASEBO QC
+# TODO: Add Quit Buttons
 
 import tkinter as tk
 from Student import Student

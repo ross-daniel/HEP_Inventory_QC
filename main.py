@@ -3,7 +3,7 @@
 #   Main program for CSU HEP Lab Inventory System, controls all data flow
 #
 #                       created by: Ross Stauder
-#                           rev: October 2022
+#                           rev: 2023
 #             DUNE - Deep Underground Neutrino Experiment
 # --------------------------------------------------------------------------------------------
 
@@ -22,9 +22,15 @@ import sys
 import subprocess
 import time
 
-# get program arguments, used to keep a user signed in across multiple sessions
-args = sys.argv[1:]
-print(args)
+
+# function to check program arguments, ensuring the user stays signed in but no extra arguments are added
+#  --- to be called before restarting the program ---
+def update_args(employee_id_num):
+    if len(sys.argv[1:]) > 0:
+        id_arg = sys.argv[-1]
+        while len(sys.argv) > 1:
+            sys.argv.pop(-1)
+        sys.argv.append(employee_id_num)
 
 # -------DATABASE SETUP-------#
 
@@ -62,16 +68,19 @@ if __name__ == "__main__":
 
     # --------------- SIGN IN PAGE --------------------------------------------------------- #
     # if the user is not already signed in, prompt them to sign in
-    if not len(args) > 0:
+    if not len(sys.argv) > 1:
         # load first page of gui, asks for an ID to be scanned
         scan_id_frame = gui.SignInFrame(gui.root)  # create the frame
         scan_id_frame.pack()  # load the frame
         csuid = scan_id_frame.csuid.get()
+        if not csuid:
+            gui.showMessage('The ID number you entered was invalid or an error occurred', 'Sign In ERROR')
+            os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
         employee = Student(csuid, ref)  # create a Student object with the entered csuid
         scan_id_frame.destroy()  # destroy the ID frame
     # if user is already signed in, set the current Student object to the correct user
     else:
-        employee = Student(args[-1], ref)
+        employee = Student(sys.argv[-1], ref)
     # --------------------------------------------------------------------------------------- #
     # ------------------ SCAN ITEM PAGE ----------------------------------------------------- #
     scan_item_frame = gui.ScanItemFrame(gui.root, employee.name)  # create the scan item frame
@@ -88,6 +97,7 @@ if __name__ == "__main__":
         cable_traveler_frame.pack()  # load cable frame
         cable_step = cable_traveler_frame.cable_step.get()  # grab user input
         obj.postToDB(cable_step, employee.name, ref)  # post traveler step to DB
+        update_args(csuid)  # update program arguments to keep the user signed in
         os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
     # --------------------------------------------------------------------------------------- #
     # ------------------- MECHANICAL -------------------------------------------------------- #
@@ -123,6 +133,7 @@ if __name__ == "__main__":
             mech_qc_frame.destroy()
             # post QC to DB
             obj.postQCtoDB(ref, batch, step, passes, total_parts, line_num_list, notes)
+            update_args(csuid)  # update program arguments to keep the user signed in
             os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
         # --------------------------------------------------------------------------------------- #
     # else send them to inventory frame
@@ -134,6 +145,7 @@ if __name__ == "__main__":
         qty = qty*-1
     inventory_frame.destroy()
     obj.postToDB(qty, False, ref)
+    update_args(csuid)  # update program arguments to keep the user signed in
     os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
     # --------------------------------------------------------------------------------------- #
 

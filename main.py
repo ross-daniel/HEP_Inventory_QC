@@ -72,6 +72,7 @@ if __name__ == "__main__":
         # load first page of gui, asks for an ID to be scanned
         scan_id_frame = gui.SignInFrame(gui.root)  # create the frame
         scan_id_frame.pack()  # load the frame
+        scan_id_frame.lift()
         csuid = scan_id_frame.csuid.get()
         if not csuid:
             gui.showMessage('The ID number you entered was invalid or an error occurred', 'Sign In ERROR')
@@ -117,15 +118,15 @@ if __name__ == "__main__":
             step_num = mech_qc_frame.step.get()
             step = obj.qc_steps[step_num-1]
             line_num_list = []
-            for index in range(len(mech_qc_frame.line_items)):
-                if mech_qc_frame.line_items[index].get() == 1:
-                    line_num_list.append(obj.line_numbers[index])
+            #for index in range(len(mech_qc_frame.line_items)):
+            #    if mech_qc_frame.line_items[index].get() == 1:
+            #        line_num_list.append(obj.line_numbers[index])
             passes = mech_qc_frame.passes.get()
             total_parts = mech_qc_frame.total_parts.get()
             notes = mech_qc_frame.notes.get()
             batch = mech_qc_frame.batch.get()
             print(f"Step: {step}")
-            print(f"Line Numbers: {line_num_list}")
+            #print(f"Line Numbers: {line_num_list}")
             print(f"Passes: {passes}")
             print(f"Total Parts: {total_parts}")
             print(f"Notes: {notes}")

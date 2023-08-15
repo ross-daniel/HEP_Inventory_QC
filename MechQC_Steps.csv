@@ -1,4 +1,4 @@
-Barcode,Item Description,Line Numbers,Dimension Check,CNC / Shopwork,Deburr / Deglue,Bag and Label,,Legend:
+Barcode,Item Description,Line Numbers,Dimension Check,CNC or Shopwork,Deburr or Deglue,Bag and Label,,Legend:
 40000yyy012x,Far Side Guide Rails (Long),"12,48",x,x,x,x,,x : requires qc process
 40000yyy019x,Readout Side Guide Rails (Short),"19,55",x,x,x,x,,- : does not require qc process
 40000yyy002x,CABLE CONTAINMENT BRACKET,2,x,-,-,x,,

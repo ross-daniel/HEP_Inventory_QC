@@ -25,6 +25,13 @@ import os
 # --------------SETUP VARIABLES AND OBJECTS---------------- #
 # setup root
 root = tk.Tk()
+root.geometry("1000x600")
+root.option_add('*Font', ('Inter', 20, 'bold'))
+image = Image.open("CSU-Ram-357-617.png")
+resized_image = image.resize((600, 600))
+bg = ImageTk.PhotoImage(resized_image)
+label1 = tk.Label(root, image=bg)
+label1.place(x=200, y=0)
 
 # ------HELPER METHODS FOR MISC TKINTER STUFF----- #
 
@@ -52,27 +59,8 @@ def showMessage(message, title):
 
 # ---------------------setup a canvas----------------------- #
 
-def set_background(root):
-    #make title and set bg
-    root.configure(background='#F0F8FF')
-    root.title('Colorado State University HEP Lab')
-
-    # set up background image
-    bg = Image.open('CSU-Ram-357-617.png')
-    resized_image= bg.resize((480, 480), Image.ANTIALIAS)
-    backdrop= ImageTk.PhotoImage(resized_image)
-
-    # setup canvas
-
-    height = 480
-    width = 800
-
-    canvas = tk.Canvas(root, width=width, height=height)
-    canvas.create_image(0, 0, image=backdrop, anchor="nw")
-    canvas.pack()
 
 # -------------- Tkinter Frame Objects ---------------- #
-
 
 class SignInFrame(tk.Frame):
     def __init__(self, parent):
@@ -82,15 +70,15 @@ class SignInFrame(tk.Frame):
         super().__init__(master=parent)
 
         # set up widgets
-        frame_label = tk.Label(self, text='Scan ID or enter ID to continue', bg='#F0F8FF', font=('arial', 14, 'normal'))
+        frame_label = tk.Label(self, text='Scan ID or enter ID to continue')
         id_entry = tk.Entry(self)
         id_entry.focus_force()
         btn = tk.Button(self, text=' Submit ', height=2, width=10, command=lambda: self.submitID(id_entry.get()))
 
         # add widgets to grid (sets location)
-        frame_label.grid(column=1, row=0)
-        id_entry.grid(column=1, row=1)
-        btn.grid(column=1, row=3)
+        frame_label.grid(column=1, row=0, padx=20, pady=20)
+        id_entry.grid(column=1, row=1, padx=20, pady=20)
+        btn.grid(column=1, row=3, padx=20, pady=20)
 
     def submitID(self, id_num):
         # -----CHECK INPUT---- #
@@ -135,21 +123,21 @@ class ScanItemFrame(tk.Frame):
         super().__init__(master=parent)
 
         # ------------------------- SETUP WIDGETS ------------------------------------- #
-        signedIn = tk.Label(self, text='Signed in as:', bg='#F0F8FF', font=('arial', 14, 'normal'))
-        user = tk.Label(self, text=self.username, bg='#F0F8FF', font=('arial', 14, 'normal'))
-        label = tk.Label(self, text='Scan an Item or Cable to Continue', bg='#F0F8FF', font=('arial', 14, 'normal'))
+        signedIn = tk.Label(self, text='Signed in as:')
+        user = tk.Label(self, text=self.username)
+        label = tk.Label(self, text='Scan an Item or Cable to Continue')
         code = tk.Entry(self)
         code.focus_force()
         btn = tk.Button(self, text=' Submit ', command=lambda: self.submitItem(code.get()))
         btn.config(height=2, width=10)
         exitBtn = tk.Button(self, text=' exit ', command=lambda: exit())
         # -------------------------- ADD TO FRAME -------------------------------------- #
-        signedIn.grid(column=0, row=0)
-        user.grid(column=1, row=0)
-        label.grid(column=1, row=1)
-        code.grid(column=1, row=2)
-        btn.grid(column=1, row=3)
-        exitBtn.grid(column=2, row=3)
+        signedIn.grid(column=0, row=0, padx=20, pady=20)
+        user.grid(column=1, row=0, padx=20, pady=20)
+        label.grid(column=1, row=1, padx=20, pady=20)
+        code.grid(column=1, row=2, padx=20, pady=20)
+        btn.grid(column=1, row=3, padx=20, pady=20)
+        exitBtn.grid(column=2, row=3, padx=20, pady=20)
 
     def submitItem(self, code):
         # check for correct barcode length
@@ -179,10 +167,10 @@ class CableTraveler(tk.Frame):
         super().__init__(master=parent)
 
         # ------------ SETUP WIDGETS ------------------------------------------------ #
-        label = tk.Label(self, text='Cable: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
-        cableLabel = tk.Label(self, text=self.cable_obj.name, bg='#F0F8FF', font=('arial', 14, 'normal'))
-        tk.Label(self, text="Last Sign-Off: ", bg='#F0F8FF', font=('arial', 14, 'normal')).grid(column=0, row=1)
-        curr_step_label = tk.Label(self, text=self.curr_step, bg='#F0F8FF', font=('arial', 14, 'normal'))
+        label = tk.Label(self, text='Cable: ')
+        cableLabel = tk.Label(self, text=self.cable_obj.name)
+        tk.Label(self, text="Last Sign-Off: ").grid(column=0, row=1)
+        curr_step_label = tk.Label(self, text=self.curr_step)
         options = [
             ('Cut to Length', 1),
             ('Labeled', 2),
@@ -202,11 +190,11 @@ class CableTraveler(tk.Frame):
         exitBtn.config(height=2, width=10)
 
         # ------------ ADD TO GRID -------------------------------------------------- #
-        label.grid(column=0, row=0)
-        cableLabel.grid(column=1, row=0)
-        curr_step_label.grid(column=1, row=1)
-        btn.grid(column=1, row=10)
-        exitBtn.grid(column=2, row=10)
+        label.grid(column=0, row=0, padx=20, pady=20)
+        cableLabel.grid(column=1, row=0, padx=20, pady=20)
+        curr_step_label.grid(column=1, row=1, padx=20, pady=20)
+        btn.grid(column=1, row=10, padx=20, pady=20)
+        exitBtn.grid(column=2, row=10, padx=20, pady=20)
 
     def submitCable(self, radio_value):
         # set the global variable current_operation to whatever cable step is being signed off on
@@ -251,15 +239,15 @@ class ChooseAction(tk.Frame):
         super().__init__(master=parent)
 
         # ------------- SETUP WIDGETS ----------------------------------------------- #
-        label = tk.Label(self, text=' Choose What To Do With Item: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
-        item_label = tk.Label(self, text=self.obj.name, bg='#F0F8FF', font=('arial', 14, 'normal'))
+        label = tk.Label(self, text=' Choose What To Do With Item: ')
+        item_label = tk.Label(self, text=self.obj.name)
         inv_btn = tk.Button(self, text=' Update Inventory ', command=lambda: self.action.set(0))
         qc_btn = tk.Button(self, text=' Complete QC Doc ', command=lambda: self.action.set(1))
         # ------------- ADD TO GRID -------------------------------------------------- #
-        label.grid(row=0, column=0)
-        item_label.grid(row=1, column=0)
-        inv_btn.grid(row=2, column=0)
-        qc_btn.grid(row=3, column=0)
+        label.grid(row=0, column=0, padx=20, pady=20)
+        item_label.grid(row=1, column=0, padx=20, pady=20)
+        inv_btn.grid(row=2, column=0, padx=20, pady=20)
+        qc_btn.grid(row=3, column=0, padx=20, pady=20)
 
     def pack(self):
         super().pack()
@@ -282,14 +270,14 @@ class MechQC(tk.Frame):
 
         super().__init__(master=parent)
 
-        form_label = tk.Label(self, text=' QC Form: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
-        part_label = tk.Label(self, text=item.name, bg='#F0F8FF', font=('arial', 14, 'normal'))
-        step_label = tk.Label(self, text=' Current Step: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
-        passes_label = tk.Label(self, text=' passes: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
-        total_parts_label = tk.Label(self, text=' total parts: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
-        line_item_label = tk.Label(self, text=' Line Number(s): ', bg='#F0F8FF', font=('arial', 14, 'normal'))
-        notes_label = tk.Label(self, text=' notes: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
-        batch_label = tk.Label(self, text=' batch: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
+        form_label = tk.Label(self, text=' QC Form: ')
+        part_label = tk.Label(self, text=item.name)
+        step_label = tk.Label(self, text=' Current Step: ')
+        passes_label = tk.Label(self, text=' passes: ')
+        total_parts_label = tk.Label(self, text=' total parts: ')
+        #line_item_label = tk.Label(self, text=' Line Number(s): ')
+        notes_label = tk.Label(self, text=' notes: ')
+        batch_label = tk.Label(self, text=' batch: ')
 
         passes_entry = tk.Entry(self)
         total_parts_entry = tk.Entry(self)
@@ -298,10 +286,10 @@ class MechQC(tk.Frame):
 
         submit_button = tk.Button(self, text=' Submit ', command=lambda: self.submitMechQC(passes_entry.get(), total_parts_entry.get(), notes_entry.get(), batch_entry.get()))
 
-        i = 0
-        for line_num in item.line_numbers:
-            tk.Checkbutton(self, text=line_num, variable=self.line_items[i], onvalue=1, offvalue=0).grid(row=2, column=i+2)
-            i += 1
+        #i = 0
+        #for line_num in item.line_numbers:
+        #    tk.Checkbutton(self, text=line_num, variable=self.line_items[i], onvalue=1, offvalue=0).grid(row=2, column=i+2)
+        #    i += 1
 
         options = []
         index = 1
@@ -311,19 +299,19 @@ class MechQC(tk.Frame):
         for option, val in options:
             tk.Radiobutton(self, text=option, variable=self.step, value=val).grid(column=val+1, row=1)
 
-        form_label.grid(row=0, column=2)
-        part_label.grid(row=0, column=3)
-        step_label.grid(row=1, column=1)
-        passes_label.grid(row=2, column=0)
-        total_parts_label.grid(row=3, column=1)
-        line_item_label.grid(row=2, column=3, columnspan=2, sticky=tk.W+tk.E)
-        notes_label.grid(row=3, column=3)
-        batch_label.grid(row=4, column=2)
-        passes_entry.grid(row=2, column=1)
-        total_parts_entry.grid(row=3, column=2)
-        notes_entry.grid(row=3, column=4)
-        batch_entry.grid(row=4, column=3)
-        submit_button.grid(row=5, column=2, columnspan=2, sticky=tk.W+tk.E)
+        form_label.grid(row=0, column=1, pady=20)
+        part_label.grid(row=0, column=2, pady=20)
+        step_label.grid(row=1, column=1, pady=20)
+        passes_label.grid(row=2, column=2, pady=20)
+        total_parts_label.grid(row=2, column=0, pady=20)
+        #line_item_label
+        notes_label.grid(row=3, column=2, pady=20)
+        batch_label.grid(row=3, column=0, pady=20)
+        passes_entry.grid(row=2, column=3, pady=20)
+        total_parts_entry.grid(row=2, column=1, pady=20)
+        notes_entry.grid(row=3, column=3, pady=20)
+        batch_entry.grid(row=3, column=1, pady=20)
+        submit_button.grid(row=4, column=2, columnspan=2, sticky=tk.W+tk.E, pady=20)
 
     def submitMechQC(self, passes_, total_parts_, notes_, batch_):
         self.passes.set(passes_)
@@ -335,6 +323,7 @@ class MechQC(tk.Frame):
         super().pack()
         self.wait_variable(self.batch)
 
+
 class MechInventoryFrame(tk.Frame):
     def __init__(self, parent, item):
 
@@ -343,8 +332,8 @@ class MechInventoryFrame(tk.Frame):
 
         super().__init__(master=parent)
 
-        label = tk.Label(self, text=' Update Item Inventory: ', bg='#F0F8FF', font=('arial', 14, 'normal'))
-        item_label = tk.Label(self, text=item.name, bg='#F0F8FF', font=('arial', 14, 'normal'))
+        label = tk.Label(self, text=' Update Item Inventory: ')
+        item_label = tk.Label(self, text=item.name)
         qty_entry = tk.Entry(self)
         options = ['+', '-']
         submit_btn = tk.Button(self, text=' Submit ', command=lambda: self.submitInventory(qty_entry.get()))
@@ -352,10 +341,10 @@ class MechInventoryFrame(tk.Frame):
         for index, opt in enumerate(options):
             tk.Radiobutton(self, text=opt, variable=self.sign, val=index).grid(row=1+index, column=1)
 
-        label.grid(row=0, column=0)
-        item_label.grid(row=0, column=1)
-        qty_entry.grid(row=2, column=0)
-        submit_btn.grid(row=4, column=1)
+        label.grid(row=0, column=0, padx=20, pady=20)
+        item_label.grid(row=0, column=1, padx=20, pady=20)
+        qty_entry.grid(row=2, column=0, padx=20, pady=20)
+        submit_btn.grid(row=4, column=1, padx=20, pady=20)
 
     def submitInventory(self, qty):
         self.quantity.set(qty)

@@ -27,10 +27,9 @@ import time
 #  --- to be called before restarting the program ---
 def update_args(employee_id_num):
     if len(sys.argv[1:]) > 0:
-        id_arg = sys.argv[-1]
         while len(sys.argv) > 1:
             sys.argv.pop(-1)
-        sys.argv.append(employee_id_num)
+    sys.argv.append(employee_id_num)
 
 # -------DATABASE SETUP-------#
 
@@ -82,6 +81,7 @@ if __name__ == "__main__":
     # if user is already signed in, set the current Student object to the correct user
     else:
         employee = Student(sys.argv[-1], ref)
+        csuid = employee.csuid
     # --------------------------------------------------------------------------------------- #
     # ------------------ SCAN ITEM PAGE ----------------------------------------------------- #
     scan_item_frame = gui.ScanItemFrame(gui.root, employee.name)  # create the scan item frame
@@ -99,6 +99,7 @@ if __name__ == "__main__":
         cable_step = cable_traveler_frame.cable_step.get()  # grab user input
         obj.postToDB(cable_step, employee.name, ref)  # post traveler step to DB
         update_args(csuid)  # update program arguments to keep the user signed in
+        print(f"args: {sys.argv}")
         os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
     # --------------------------------------------------------------------------------------- #
     # ------------------- MECHANICAL -------------------------------------------------------- #

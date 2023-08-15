@@ -25,7 +25,7 @@ import os
 # --------------SETUP VARIABLES AND OBJECTS---------------- #
 # setup root
 root = tk.Tk()
-root.geometry("1000x600")
+root.geometry("1200x600")
 root.option_add('*Font', ('Inter', 20, 'bold'))
 image = Image.open("CSU-Ram-357-617.png")
 resized_image = image.resize((600, 600))
@@ -297,11 +297,11 @@ class MechQC(tk.Frame):
             options.append((step, index))
             index += 1
         for option, val in options:
-            tk.Radiobutton(self, text=option, variable=self.step, value=val).grid(column=val+1, row=1)
+            tk.Radiobutton(self, text=option, variable=self.step, value=val).grid(column=val, row=1)
 
         form_label.grid(row=0, column=1, pady=20)
         part_label.grid(row=0, column=2, pady=20)
-        step_label.grid(row=1, column=1, pady=20)
+        step_label.grid(row=1, column=0, pady=20)
         passes_label.grid(row=2, column=2, pady=20)
         total_parts_label.grid(row=2, column=0, pady=20)
         #line_item_label

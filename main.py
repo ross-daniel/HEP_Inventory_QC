@@ -23,8 +23,12 @@ import subprocess
 import time
 
 # get program arguments, used to keep a user signed in across multiple sessions
-args = sys.argv[1:]
-print(args)
+
+
+def update_arguments(employee_id):
+    while len(sys.argv[1:]) > 0:
+        sys.argv.pop(-1)
+    sys.argv.append(employee_id)
 
 # -------DATABASE SETUP-------#
 
@@ -61,7 +65,7 @@ if __name__ == "__main__":
 
     # --------------- SIGN IN PAGE --------------------------------------------------------- #
     # if the user is not already signed in, prompt them to sign in
-    if not len(args) > 0:
+    if not len(sys.argv[1:]) > 0:
         # load first page of gui, asks for an ID to be scanned
         scan_id_frame = gui.SignInFrame(gui.root)  # create the frame
         scan_id_frame.pack()  # load the frame
@@ -71,7 +75,7 @@ if __name__ == "__main__":
         scan_id_frame.destroy()  # destroy the ID frame
     # if user is already signed in, set the current Student object to the correct user
     else:
-        employee = Student(args[-1], ref)
+        employee = Student(sys.argv[-1], ref)
         csuid = employee.csuid
     # --------------------------------------------------------------------------------------- #
     # ------------------ SCAN ITEM PAGE ----------------------------------------------------- #
@@ -89,7 +93,7 @@ if __name__ == "__main__":
         cable_traveler_frame.pack()  # load cable frame
         cable_step = cable_traveler_frame.cable_step.get()  # grab user input
         obj.postToDB(cable_step, employee.name, ref)  # post traveler step to DB
-        sys.argv.append(csuid)
+        update_arguments(csuid)
         os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
     # --------------------------------------------------------------------------------------- #
     # ------------------- MECHANICAL -------------------------------------------------------- #
@@ -126,7 +130,7 @@ if __name__ == "__main__":
             mech_qc_frame.destroy()
             # post QC to DB
             obj.postQCtoDB(ref, batch, step, passes, total_parts, line_num_list, notes)
-            sys.argv.append(csuid)
+            update_arguments(csuid)
             os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
         # --------------------------------------------------------------------------------------- #
     # else send them to inventory frame
@@ -139,7 +143,7 @@ if __name__ == "__main__":
         qty = qty*-1
     inventory_frame.destroy()
     obj.postToDB(qty, False, ref)
-    sys.argv.append(csuid)
+    update_arguments(csuid)
     os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
     # --------------------------------------------------------------------------------------- #
 

@@ -23,8 +23,6 @@ import subprocess
 import time
 
 # get program arguments, used to keep a user signed in across multiple sessions
-
-
 def update_arguments(employee_id):
     while len(sys.argv[1:]) > 0:
         sys.argv.pop(-1)
@@ -129,7 +127,7 @@ if __name__ == "__main__":
             print(f"Batch: {batch}")
             mech_qc_frame.destroy()
             # post QC to DB
-            obj.postQCtoDB(ref, batch, step, passes, total_parts, line_num_list, notes)
+            obj.postQCtoDB(ref, batch, step, passes, total_parts, line_num_list, notes, employee)
             update_arguments(csuid)
             os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
         # --------------------------------------------------------------------------------------- #

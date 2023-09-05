@@ -12,6 +12,7 @@ import csv
 import sheet
 import gui
 from googleapiclient.errors import HttpError
+from datetime import datetime
 #import yagmail
 
 
@@ -123,11 +124,13 @@ class Item:
             gui.showMessage("Database and Spreadsheet hold different values, please take a count of this item and update the proper location", "INVENTORY INCONSISTENCY")
 
     # adds the QC doc to the database
-    def postQCtoDB(self, ref, batch_num, qc_step, passes, total_parts, line_items, notes):
+    def postQCtoDB(self, ref, batch_num, qc_step, passes, total_parts, line_items, notes, user):
         ref = ref.child('Mechanical QC Docs').child(self.name).child(batch_num).child(qc_step)
         ref.update({'passes': passes})
         ref.update({'total parts': total_parts})
         ref.update({'notes': notes})
+        ref.update({'signature': user.name})
+        ref.update({'date': str(datetime.date(datetime.now()))})
 
     def has_qc_form(self):
         if len(self.qc_steps) > 0:

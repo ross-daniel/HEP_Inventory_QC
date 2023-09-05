@@ -116,8 +116,7 @@ if __name__ == "__main__":
             # ------------------- MECHANICAL QC ----------------------------------------------------- #
             mech_qc_frame = gui.MechQC(gui.root, obj)
             mech_qc_frame.pack()
-            step_num = mech_qc_frame.step.get()
-            step = obj.qc_steps[step_num-1]
+            step = mech_qc_frame.clicked.get()
             line_num_list = []
             #for index in range(len(mech_qc_frame.line_items)):
             #    if mech_qc_frame.line_items[index].get() == 1:
@@ -134,7 +133,7 @@ if __name__ == "__main__":
             print(f"Batch: {batch}")
             mech_qc_frame.destroy()
             # post QC to DB
-            obj.postQCtoDB(ref, batch, step, passes, total_parts, line_num_list, notes)
+            obj.postQCtoDB(ref, batch, step, passes, total_parts, line_num_list, notes, employee.name)
             update_args(csuid)  # update program arguments to keep the user signed in
             os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
         # --------------------------------------------------------------------------------------- #

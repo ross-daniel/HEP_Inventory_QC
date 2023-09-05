@@ -259,7 +259,7 @@ class MechQC(tk.Frame):
 
         qc_steps = item.qc_steps
 
-        self.step = tk.IntVar()
+        self.clicked = tk.StringVar()
         self.line_items = []
         for i in range(4):
             self.line_items.append(tk.IntVar())
@@ -292,16 +292,17 @@ class MechQC(tk.Frame):
         #    i += 1
 
         options = []
-        index = 1
         for step in qc_steps:
-            options.append((step, index))
-            index += 1
-        for option, val in options:
-            tk.Radiobutton(self, text=option, variable=self.step, value=val).grid(column=val, row=1)
+            options.append(step)
+        default_opt = options[0]
+        self.clicked.set(default_opt)
+
+        dropdown = tk.OptionMenu(self, self.clicked, *options)
 
         form_label.grid(row=0, column=1, pady=20)
         part_label.grid(row=0, column=2, pady=20)
         step_label.grid(row=1, column=0, pady=20)
+        dropdown.grid(row=1, column=1, pady=20)
         passes_label.grid(row=2, column=2, pady=20)
         total_parts_label.grid(row=2, column=0, pady=20)
         #line_item_label

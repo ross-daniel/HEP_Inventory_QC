@@ -27,6 +27,7 @@ try:
 except HttpError as err:
     print(err)
 
+
 class Sheet:
     def __init__(self, *inp):
         # members:

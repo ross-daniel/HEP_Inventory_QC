@@ -109,8 +109,7 @@ if __name__ == "__main__":
             # ------------------- MECHANICAL QC ----------------------------------------------------- #
             mech_qc_frame = gui.MechQC(gui.root, obj)
             mech_qc_frame.pack()
-            step_num = mech_qc_frame.step.get()
-            step = obj.qc_steps[step_num-1]
+            step = mech_qc_frame.clicked.get()
             line_num_list = []
             #for index in range(len(mech_qc_frame.line_items)):
             #    if mech_qc_frame.line_items[index].get() == 1:

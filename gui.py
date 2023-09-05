@@ -158,6 +158,7 @@ class CableTraveler(tk.Frame):
     def __init__(self, parent, cable_obj_, curr_step_):
 
         self.cable_step = tk.StringVar()
+        self.temp_step = tk.StringVar()
         self.cable_obj = cable_obj_
         self.curr_step = curr_step_
 
@@ -171,20 +172,30 @@ class CableTraveler(tk.Frame):
         cableLabel = tk.Label(self, text=self.cable_obj.name)
         tk.Label(self, text="Last Sign-Off: ").grid(column=0, row=1)
         curr_step_label = tk.Label(self, text=self.curr_step)
+        tk.Label(self, text=' Step: ').grid(column=0, row=2)
         options = [
-            ('Cut to Length', 1),
-            ('Labeled', 2),
-            ('Headers*', 3),
-            ('Stripped', 4),
-            ('Connector', 5),
-            ('Prelim Test', 6),
-            ('Heat Shrink', 7),
-            ('Final Test', 8),
-            ('Verify QC', 9)
+            'Cut to Length',
+            'Labeled',
+            'Headers',
+            'Stripped',
+            'Connector',
+            'Prelim Test',
+            'Heat Shrink',
+            'Final Test',
+            'Verify QC'
         ]
-        for option, val in options:
-            tk.Radiobutton(self, text=option, variable=self.radio, value=val).grid(column=0, row=val+1)
-        btn = tk.Button(self, text=' Submit ', command=lambda: self.submitCable(self.radio.get()))
+        #for option, val in options:
+        #    tk.Radiobutton(self, text=option, variable=self.radio, value=val).grid(column=0, row=val+1)
+        try:
+            default_opt = options[options.index(self.curr_step)+1]
+        except:
+            default_opt = options[-1]
+
+        self.temp_step.set(default_opt)
+        dropdown = tk.OptionMenu(self, self.temp_step, *options)
+        dropdown.grid(column=1, row=2, pady=20)
+
+        btn = tk.Button(self, text=' Submit ', command=lambda: self.submitCable())
         btn.config(height=2, width=10)
         exitBtn = tk.Button(self, text=' exit ', command=lambda: exit())
         exitBtn.config(height=2, width=10)
@@ -196,34 +207,9 @@ class CableTraveler(tk.Frame):
         btn.grid(column=1, row=10, padx=20, pady=20)
         exitBtn.grid(column=2, row=10, padx=20, pady=20)
 
-    def submitCable(self, radio_value):
+    def submitCable(self):
         # set the global variable current_operation to whatever cable step is being signed off on
-        if radio_value == 1:
-            # Cut
-            self.cable_step.set('Cut to Length')
-        elif radio_value == 2:
-            # Labeled
-            self.cable_step.set('Labeled')
-        elif radio_value == 3:
-            # Headers
-            self.cable_step.set('Headers')
-        elif radio_value == 4:
-            # Stripped
-            self.cable_step.set('Stripped')
-        elif radio_value == 5:
-            # Connector
-            self.cable_step.set('Connector')
-        elif radio_value == 6:
-            # Prelim Test
-            self.cable_step.set('Prelim Test')
-        elif radio_value == 7:
-            # Heat Shrink
-            self.cable_step.set('Heat Shrink')
-        elif radio_value == 8:
-            # Final Test
-            self.cable_step.set('Final Test')
-        elif radio_value == 9:
-            self.cable_step.set('QC Verified')
+        self.cable_step.set(self.temp_step.get())
 
     def pack(self):
         super().pack()

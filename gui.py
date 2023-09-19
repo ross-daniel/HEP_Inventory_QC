@@ -343,3 +343,19 @@ class MechInventoryFrame(tk.Frame):
     def pack(self):
         super().pack()
         self.wait_variable(self.quantity)
+
+
+class ShipmentFrame(tk.Frame):
+    def __init__(self, parent):
+
+        self.batch_num_1 = tk.StringVar()
+        self.batch_num_2 = tk.StringVar()
+
+        super().__init__(master=parent)
+
+    def submit(self, _num_1, _num_2):
+        self.batch_num_1.set(_num_1)
+        self.batch_num_2.set(_num_2)
+
+    def pack(self):
+        self.wait_variable(self.batch_num_1)

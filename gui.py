@@ -73,14 +73,14 @@ class SignInFrame(tk.Frame):
         frame_label = tk.Label(self, text='Scan ID or enter ID to continue')
         id_entry = tk.Entry(self)
         id_entry.focus_force()
-        btn = tk.Button(self, text=' Submit ', height=2, width=10, command=lambda: self.submitID(id_entry.get()))
+        btn = tk.Button(self, text=' Submit ', height=2, width=10, command=lambda: self.submit(id_entry.get()))
 
         # add widgets to grid (sets location)
         frame_label.grid(column=1, row=0, padx=20, pady=20)
         id_entry.grid(column=1, row=1, padx=20, pady=20)
         btn.grid(column=1, row=3, padx=20, pady=20)
 
-    def submitID(self, id_num):
+    def submit(self, id_num):
         # -----CHECK INPUT---- #
 
         # check length of input
@@ -128,7 +128,7 @@ class ScanItemFrame(tk.Frame):
         label = tk.Label(self, text='Scan an Item or Cable to Continue')
         code = tk.Entry(self)
         code.focus_force()
-        btn = tk.Button(self, text=' Submit ', command=lambda: self.submitItem(code.get()))
+        btn = tk.Button(self, text=' Submit ', command=lambda: self.submit(code.get()))
         btn.config(height=2, width=10)
         exitBtn = tk.Button(self, text=' exit ', command=lambda: exit())
         # -------------------------- ADD TO FRAME -------------------------------------- #
@@ -139,7 +139,7 @@ class ScanItemFrame(tk.Frame):
         btn.grid(column=1, row=3, padx=20, pady=20)
         exitBtn.grid(column=2, row=3, padx=20, pady=20)
 
-    def submitItem(self, code):
+    def submit(self, code):
         # check for correct barcode length
         if len(code) > 12 or len(code) < 9:
             messagebox.showinfo('Invalid Code', 'Error: The Barcode you Entered is Invalid')
@@ -195,7 +195,7 @@ class CableTraveler(tk.Frame):
         dropdown = tk.OptionMenu(self, self.temp_step, *options)
         dropdown.grid(column=1, row=2, pady=20)
 
-        btn = tk.Button(self, text=' Submit ', command=lambda: self.submitCable())
+        btn = tk.Button(self, text=' Submit ', command=lambda: self.submit())
         btn.config(height=2, width=10)
         exitBtn = tk.Button(self, text=' exit ', command=lambda: exit())
         exitBtn.config(height=2, width=10)
@@ -207,7 +207,7 @@ class CableTraveler(tk.Frame):
         btn.grid(column=1, row=10, padx=20, pady=20)
         exitBtn.grid(column=2, row=10, padx=20, pady=20)
 
-    def submitCable(self):
+    def submit(self):
         # set the global variable current_operation to whatever cable step is being signed off on
         self.cable_step.set(self.temp_step.get())
 
@@ -270,7 +270,7 @@ class MechQC(tk.Frame):
         notes_entry = tk.Entry(self)
         batch_entry = tk.Entry(self)
 
-        submit_button = tk.Button(self, text=' Submit ', command=lambda: self.submitMechQC(passes_entry.get(), total_parts_entry.get(), notes_entry.get(), batch_entry.get()))
+        submit_button = tk.Button(self, text=' Submit ', command=lambda: self.submit(passes_entry.get(), total_parts_entry.get(), notes_entry.get(), batch_entry.get()))
 
         #i = 0
         #for line_num in item.line_numbers:
@@ -302,7 +302,7 @@ class MechQC(tk.Frame):
         batch_entry.grid(row=3, column=1, pady=20)
         submit_button.grid(row=4, column=2, columnspan=2, sticky=tk.W+tk.E, pady=20)
 
-    def submitMechQC(self, passes_, total_parts_, notes_, batch_):
+    def submit(self, passes_, total_parts_, notes_, batch_):
         self.passes.set(passes_)
         self.total_parts.set(total_parts_)
         self.notes.set(notes_)
@@ -326,7 +326,7 @@ class MechInventoryFrame(tk.Frame):
         item_label = tk.Label(self, text=item.name)
         qty_entry = tk.Entry(self)
         options = ['+', '-']
-        submit_btn = tk.Button(self, text=' Submit ', command=lambda: self.submitInventory(qty_entry.get()))
+        submit_btn = tk.Button(self, text=' Submit ', command=lambda: self.submit(qty_entry.get()))
 
         for index, opt in enumerate(options):
             tk.Radiobutton(self, text=opt, variable=self.sign, val=index).grid(row=1+index, column=1)
@@ -337,7 +337,7 @@ class MechInventoryFrame(tk.Frame):
         qty_entry.grid(row=2, column=0, padx=20, pady=20)
         submit_btn.grid(row=4, column=1, padx=20, pady=20)
 
-    def submitInventory(self, qty):
+    def submit(self, qty):
         self.quantity.set(qty)
 
     def pack(self):

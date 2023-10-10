@@ -82,7 +82,8 @@ class Sheet:
         except HttpError as err:
             print(err)
             return 0
-        row_count = new_response['sheets'][self.get_sheet_index()]['bandedRanges'][0]['range']['endRowIndex']
+        print(new_response['sheets'][self.get_sheet_index()])
+        row_count = new_response['sheets'][self.get_sheet_index()]['properties']['gridProperties']['rowCount']
         return row_count
 
     # returns the number of columns in a sheet
@@ -93,7 +94,7 @@ class Sheet:
         except HttpError as err:
             print(err)
             return 0
-        col_count = new_response['sheets'][self.get_sheet_index()]['bandedRanges'][0]['range']['endColumnIndex']
+        col_count = new_response['sheets'][self.get_sheet_index()]['properties']['gridProperties']['columnCount']
         return col_count
 
     # returns the data at a specified cell

@@ -74,8 +74,7 @@ class Item:
     # determines part details based on product code
     # reads csv file and creates a 2D array of product codes and their corresponding parameters
     def readProductCode(self):
-        target = f"y{self.product_code[8]}{self.product_code[9]}{self.product_code[10]}"
-        print(target)
+        target = self.target
         for index, item in enumerate(Item.inventory_list):
             if target in item[0]:
                 self.product_code = item[0]  # make barcode exactly as it appears in the sheet
@@ -107,14 +106,14 @@ class Item:
                 ref.child(self.name).update({'qty': qty})
 
         # ----------- update spreadsheet -------------------- #
-        cell_rep = ssheet.find_cell_rep(self.product_code, 'Stock')
-        curr_qty = ssheet.get_data(cell_rep[0], cell_rep[1])       # finds the current quantity of the item
+        cell_rep = ssheet.find_cell_rep(self, 'Stock')
+        curr_qty = ssheet.get_data(self, 'Stock')       # finds the current quantity of the item
         if curr_qty == '':
             curr_qty = 0
         else:
             curr_qty = int(curr_qty)
-        print(f"cell_rep[0]: {cell_rep[0]}")
-        print(f"cell_rep[1]: {cell_rep[1]}")
+        #print(f"cell_rep[0]: {cell_rep[0]}")
+        #print(f"cell_rep[1]: {cell_rep[1]}")
         print(f"total quantity: {curr_qty+qty}")
         try:
             ssheet.post_data(cell_rep[0], cell_rep[1], curr_qty+qty)    # updates the spreadsheet
@@ -154,7 +153,8 @@ class Item:
         return qc_steps_list  # should return something like: ['Dimension Check', 'Deburr / Deglue', 'Bag and Label']
 
     def __init__(self, product_code):
-        self.product_code = product_code
+        self.product_code = product_code  # gets redefined so that this value is exactly as it appears on the spreadsheet
+        self.target = f"y{self.product_code[8]}{self.product_code[9]}{self.product_code[10]}"
         properties = self.readProductCode()
         self.name = properties[2]
         print(self.name)

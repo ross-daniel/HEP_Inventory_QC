@@ -39,7 +39,8 @@ class Sheet:
         self.sheet_name = name
         self.rows = self.get_rows()
         self.cols = self.get_cols()
-        self.identifiers = self.get_column_ids()
+        self.identifiers = self.get_data_list(1, True)  # self.get_column_ids()
+        self.barcodes = self.get_data_list(1, False)
 
     # ------------  HELPERS --------------
 
@@ -59,15 +60,15 @@ class Sheet:
     def find_cell_rep(self, item, identifier):
         row = None
         col = None
-        top_row = self.get_data_list(1, True) # returns the first row of the sheet
-        first_column = self.get_data_list(1, False) # returns the first column in the sheet
-        #for index, item in enumerate(top_row):
-        #    if item == column:
-        #        col = index + 1
-        #for index, item in enumerate(first_column):
-        #    if line_num in item:
-        #        row = index + 1
-        #return [row, col]
+        top_row = self.identifiers  # returns the first row of the sheet
+        first_column = self.barcodes # returns the first column in the sheet
+        for index, value in enumerate(top_row):
+            if item == identifier:
+                col = index + 1
+        for index, value in enumerate(first_column):
+            if item.target in value:
+                row = index + 1
+        return [row, col]
 
     # -------------------------------------
 
@@ -104,49 +105,37 @@ class Sheet:
             return []
 
     # returns the data at a specified cell
-    def get_data(self, row, col):
-        range_arg = self.sheet_name + '!' + 'A1:' + self.convertColumn(self.cols) + str(self.get_rows())
-        new_request = service.spreadsheets().values().get(spreadsheetId=self.sheetId, range=range_arg)
-        try:
-            new_response = new_request.execute()
-        except HttpError as err:
-            print(err)
-            return -1
-        values = new_response.get('values', [])
-        try:
-            val = values[row-1][col-1]
-        except IndexError as err:
-            val = 0
-            print(err)
-        return val
+    def get_data(self, item, indentifier):
+        col = indentifier.index(indentifier)
+        row = -1
+        for index, value in enumerate(self.barcodes):
+            if item.product_code == value[0]:
+                row = index + 1
+                break
+        full_row = self.get_data_list(row, True)
+        print(full_row)
+        return full_row[col-1]
 
     # returns an entire row (true) or column (false)
     def get_data_list(self, rc_index, is_row):
-        print("got here")
         if is_row:
             range_arg = self.sheet_name + '!' + str(rc_index) + ':' + str(rc_index)  # range arg for the entire row (A1 notation)
-            print(range_arg)
             new_request = service.spreadsheets().values().get(spreadsheetId=self.sheetId, range=range_arg)
             try:
                 new_response = new_request.execute()
-                print(new_response.get('values'))
-                return new_response.get('values', [])[rc_index-1]
+                return new_response.get('values', [])[0]
             except HttpError as err:
                 print(err)
                 return -1
         else:
-            range_arg = self.sheet_name + '!' + self.convertColumn(rc_index) + '1:' + self.convertColumn(self.cols) + str(self.rows)
+            range_arg = self.sheet_name + '!' + self.convertColumn(rc_index) + ':' + self.convertColumn(rc_index)
             new_request = service.spreadsheets().values().get(spreadsheetId=self.sheetId, range=range_arg)
             try:
                 new_response = new_request.execute()
-                values = new_response.get('values', [])[rc_index-1]
+                return new_response.get('values', [])[0]
             except HttpError as err:
                 print(err)
                 return -1
-            vals = []
-            for item in values:
-                vals.append(item[rc_index-1])
-            return vals
 
     # returns true if the spreadsheet exists
     def exists(self):

@@ -12,6 +12,7 @@ import gui
 from Student import Student
 from Cable import Cable
 from Item import Item
+from sheet import Sheet
 
 class MyTestCase(unittest.TestCase):
 
@@ -52,6 +53,10 @@ class MyTestCase(unittest.TestCase):
     def test_student(self):
         student = Student('833068328')
         self.assertEqual(student.name, 'Ross Stauder')
+
+    #def test_sheet(self):
+        #test_sheet = Sheet()
+        #self.assertEqual(test_sheet)
 
 # TODO: !!!!!!!! Write More Test Cases !!!!!!!!!
 

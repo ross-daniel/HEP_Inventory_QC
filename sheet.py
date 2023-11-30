@@ -27,17 +27,19 @@ try:
 except HttpError as err:
     print(err)
 
+
 class Sheet:
-    def __init__(self, *inp):
+    def __init__(self, sid="1cLLx9eAhPwMRBq-8NWbToL408jOAgZCuEcejaFOKW-k", name="InventorySheet"):
         # members:
         # sheetId -- id for the sheet (comes from URL)
         # sheet_name -- the name of the specific sheet within the spreadsheet
         # rows -- number of rows
         # cols -- number of columns
-        self.sheetId = inp[0]
-        self.sheet_name = inp[1]
+        self.sheetId = sid
+        self.sheet_name = name
         self.rows = self.get_rows()
         self.cols = self.get_cols()
+        self.identifiers = self.get_column_ids()
 
     # ------------  HELPERS --------------
 
@@ -54,22 +56,18 @@ class Sheet:
             return chr(64 + col)
 
     # finds the row/column of the stock or cleaned cell for a given item
-    def find_cell_rep(self, barcode, column):
+    def find_cell_rep(self, item, identifier):
         row = None
         col = None
-        line_num = barcode[8:]
-        line_num_list = list(line_num)
-        line_num_list[len(line_num_list)-1] = 'x'
-        line_num = ''.join(line_num_list)
         top_row = self.get_data_list(1, True) # returns the first row of the sheet
         first_column = self.get_data_list(1, False) # returns the first column in the sheet
-        for index, item in enumerate(top_row):
-            if item == column:
-                col = index + 1
-        for index, item in enumerate(first_column):
-            if line_num in item:
-                row = index + 1
-        return [row, col]
+        #for index, item in enumerate(top_row):
+        #    if item == column:
+        #        col = index + 1
+        #for index, item in enumerate(first_column):
+        #    if line_num in item:
+        #        row = index + 1
+        #return [row, col]
 
     # -------------------------------------
 
@@ -95,6 +93,16 @@ class Sheet:
         col_count = new_response['sheets'][self.get_sheet_index()]['bandedRanges'][0]['range']['endColumnIndex']
         return col_count
 
+    def get_column_ids(self):
+        range_arg = self.sheet_name + '!1:1'  # range arg for the entire top row (A1 notation)
+        new_request = service.spreadsheets().values().get(spreadsheetId=self.sheetId, range=range_arg)
+        try:
+            new_response = new_request.execute()
+            return new_response.get('values', [])
+        except HttpError as err:
+            print(err)
+            return []
+
     # returns the data at a specified cell
     def get_data(self, row, col):
         range_arg = self.sheet_name + '!' + 'A1:' + self.convertColumn(self.cols) + str(self.get_rows())
@@ -113,21 +121,31 @@ class Sheet:
         return val
 
     # returns an entire row (true) or column (false)
-    def get_data_list(self, index, is_row):
-        range_arg = self.sheet_name + '!' + 'A1:' + self.convertColumn(self.cols) + str(self.get_rows())
-        new_request = service.spreadsheets().values().get(spreadsheetId=self.sheetId, range=range_arg)
-        try:
-            new_response = new_request.execute()
-        except HttpError as err:
-            print(err)
-            return -1
-        values = new_response.get('values', [])
-        if(is_row):
-            return values[index-1]
+    def get_data_list(self, rc_index, is_row):
+        print("got here")
+        if is_row:
+            range_arg = self.sheet_name + '!' + str(rc_index) + ':' + str(rc_index)  # range arg for the entire row (A1 notation)
+            print(range_arg)
+            new_request = service.spreadsheets().values().get(spreadsheetId=self.sheetId, range=range_arg)
+            try:
+                new_response = new_request.execute()
+                print(new_response.get('values'))
+                return new_response.get('values', [])[rc_index-1]
+            except HttpError as err:
+                print(err)
+                return -1
         else:
+            range_arg = self.sheet_name + '!' + self.convertColumn(rc_index) + '1:' + self.convertColumn(self.cols) + str(self.rows)
+            new_request = service.spreadsheets().values().get(spreadsheetId=self.sheetId, range=range_arg)
+            try:
+                new_response = new_request.execute()
+                values = new_response.get('values', [])[rc_index-1]
+            except HttpError as err:
+                print(err)
+                return -1
             vals = []
             for item in values:
-                vals.append(item[index-1])
+                vals.append(item[rc_index-1])
             return vals
 
     # returns true if the spreadsheet exists

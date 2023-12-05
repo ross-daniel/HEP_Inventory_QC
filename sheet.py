@@ -105,15 +105,14 @@ class Sheet:
 
     # returns the data at a specified cell
     def get_data(self, item, identifier):
-        col = identifier.index(identifier)
+        col = self.identifiers.index(identifier)
         row = -1
         for index, value in enumerate(self.barcodes):
             if item.product_code == value:
                 row = index + 1
                 break
         full_row = self.get_data_list(row, True)
-        print(full_row)
-        return full_row[col-1]
+        return full_row[col]
 
     # returns an entire row (true) or column (false) at the index given
     def get_data_list(self, rc_index, is_row):
@@ -129,7 +128,6 @@ class Sheet:
                 return -1
         else:
             range_arg = self.sheet_name + '!' + self.convertColumn(rc_index) + ':' + self.convertColumn(rc_index)
-            print(range_arg)
             new_request = service.spreadsheets().values().get(spreadsheetId=self.sheetId, range=range_arg)
             try:
                 new_response = new_request.execute()

@@ -36,6 +36,8 @@ class Item:
             return 0
         return int(ref.get('qty'))
 
+
+    # gets the number of cleaned 'self's in the DB
     def getClean(self, ref):
         ref = ref.child('Mechanical').child(self.name).get()
         num_cleaned = 0
@@ -86,6 +88,7 @@ class Item:
         ref = reference.child('Mechanical')
         ssheet = sheet.Sheet('1cLLx9eAhPwMRBq-8NWbToL408jOAgZCuEcejaFOKW-k', 'InventorySheet')
         if self.name in ref.get().keys():
+            print(f"is name in keys? {self.name in ref.get().keys()}")
             # item already exists in the database
             # find the current quantity of the item
             currQty = self.getQty(reference)
@@ -127,13 +130,36 @@ class Item:
         ref.update({'signature': username})
         ref.update({'date': str(datetime.date(datetime.now()))})
 
+        # update spreadsheet
+        ssheet = sheet.Sheet()
+        curr_qc_qty = ssheet.get_data(self, qc_step)
+        total_qc_qty = curr_qc_qty + passes
+        ssheet.post_data(self, qc_step, total_qc_qty)
+
     def has_qc_form(self):
         if len(self.qc_steps) > 0:
             return True
         else:
             return False
 
+    # returns all the QC steps for a given item as a list
     def get_qc_steps(self):
+        # TODO: Rework to use new spreadsheet methods
+
+        # ssheet = sheet.Sheet() # create a spreadsheet
+        # all_labels = ssheet.identifiers # grab the column headers
+
+        # item_row_index = ssheet.find_row_index(self)  # get the index of the row for the current item
+        # item_row = ssheet.get_data_list(item_row_index) # get all the data for the current item in the spreadsheet
+
+        # stock_index = all_labels.index('Stock') # get the
+        # end_index = len(all_labels)
+
+        # num_steps = end_index - stock_index
+
+        # print(num_steps)
+
+
         qc_steps_list = []
         for part_list in Item.qc_list:  # iterate through all rows of the spreadsheet
             if part_list[0] == self.product_code:  # check the second column of each row until a matching part description is found
@@ -148,7 +174,7 @@ class Item:
         return qc_steps_list  # should return something like: ['Dimension Check', 'Deburr / Deglue', 'Bag and Label']
 
     def __init__(self, product_code):
-        self.product_code = product_code  # gets redefined so that this value is exactly as it appears on the spreadsheet
+        self.product_code = str(product_code)  # gets redefined so that this value is exactly as it appears on the spreadsheet
         self.target = f"y{self.product_code[8]}{self.product_code[9]}{self.product_code[10]}"
         properties = self.readProductCode()
         self.name = properties[2]

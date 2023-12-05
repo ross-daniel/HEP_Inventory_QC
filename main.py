@@ -23,13 +23,11 @@ import subprocess
 import time
 
 
-# function to check program arguments, ensuring the user stays signed in but no extra arguments are added
-#  --- to be called before restarting the program ---
-def update_args(employee_id_num):
-    if len(sys.argv[1:]) > 0:
-        while len(sys.argv) > 1:
-            sys.argv.pop(-1)
-    sys.argv.append(employee_id_num)
+# get program arguments, used to keep a user signed in across multiple sessions
+def update_arguments(employee_id):
+    while len(sys.argv[1:]) > 0:
+        sys.argv.pop(-1)
+    sys.argv.append(employee_id)
 
 # -------DATABASE SETUP-------#
 
@@ -39,7 +37,6 @@ def update_args(employee_id_num):
 
 #retrieve admin credentials
 cred = credentials.Certificate('hep---dune-firebase-adminsdk-gtwlw-40673207a6.json')
-
 # Initialize the app with a service account, granting admin privileges
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://hep---dune-default-rtdb.firebaseio.com'
@@ -98,11 +95,11 @@ if __name__ == "__main__":
         cable_traveler_frame.pack()  # load cable frame
         cable_step = cable_traveler_frame.cable_step.get()  # grab user input
         obj.postToDB(cable_step, employee.name, ref)  # post traveler step to DB
-        update_args(csuid)  # update program arguments to keep the user signed in
-        print(f"args: {sys.argv}")
+        update_arguments(csuid)
         os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
     # --------------------------------------------------------------------------------------- #
     # ------------------- MECHANICAL -------------------------------------------------------- #
+    print(ref.child('Mechanical'))
     obj = Item(barcode)
     # decide whether the scanned item has a QC form or not
 
@@ -134,19 +131,20 @@ if __name__ == "__main__":
             mech_qc_frame.destroy()
             # post QC to DB
             obj.postQCtoDB(ref, batch, step, passes, total_parts, line_num_list, notes, employee.name)
-            update_args(csuid)  # update program arguments to keep the user signed in
+            update_arguments(csuid)  # update program arguments to keep the user signed in
             os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
         # --------------------------------------------------------------------------------------- #
     # else send them to inventory frame
     # ------------------- INVENTORY --------------------------------------------------------- #
-    inventory_frame = gui.MechInventoryFrame(gui.root, obj)
+    curr_qty = obj.getQty(ref)  # temporary (hopefully)
+    inventory_frame = gui.MechInventoryFrame(gui.root, obj, curr_qty)
     inventory_frame.pack()
     qty = inventory_frame.quantity.get()
     if inventory_frame.sign.get() == 1:
         qty = qty*-1
     inventory_frame.destroy()
     obj.postToDB(qty, 'Stock', ref)
-    update_args(csuid)  # update program arguments to keep the user signed in
+    update_arguments(csuid)  # update program arguments to keep the user signed in
     os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
     # --------------------------------------------------------------------------------------- #
 

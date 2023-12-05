@@ -82,7 +82,7 @@ class Item:
                 return list(Item.inventory_list[index])
 
     # updates the inventory of the given item by a given quantity
-    def postToDB(self, qty, clean, reference):
+    def postToDB(self, qty, identifier, reference):
         ref = reference.child('Mechanical')
         ssheet = sheet.Sheet('1cLLx9eAhPwMRBq-8NWbToL408jOAgZCuEcejaFOKW-k', 'InventorySheet')
         if self.name in ref.get().keys():
@@ -94,34 +94,29 @@ class Item:
                 # send automated email to zach if quantity drops below shipment quantity
                 self.sendEmail(currQty + int(qty))
             # update the quantity of the item
-            if clean:
+            if identifier == 'Clean':
                 ref.child(self.name).update({'clean': currClean+qty})
-            else:
+            elif identifier == 'Stock':
                 ref.child(self.name).update({'qty': currQty+qty})
         else:
             # item has not yet been added to database
-            if clean:
+            if identifier == 'Clean':
                 ref.child(self.name).update({'clean': qty})
-            else:
+            elif identifier == 'Stock':
                 ref.child(self.name).update({'qty': qty})
 
         # ----------- update spreadsheet -------------------- #
-        cell_rep = ssheet.find_cell_rep(self, 'Stock')
         curr_qty = ssheet.get_data(self, 'Stock')       # finds the current quantity of the item
         if curr_qty == '':
             curr_qty = 0
         else:
             curr_qty = int(curr_qty)
-        #print(f"cell_rep[0]: {cell_rep[0]}")
-        #print(f"cell_rep[1]: {cell_rep[1]}")
         print(f"total quantity: {curr_qty+qty}")
         try:
-            ssheet.post_data(cell_rep[0], cell_rep[1], curr_qty+qty)    # updates the spreadsheet
+            ssheet.post_data(item=self, identifier='Stock', data=curr_qty+qty)    # updates the spreadsheet
         except HttpError as e:
             print(e)
         # make sure the spreadsheet and database show the same value
-        if curr_qty != currQty:
-            gui.showMessage("Database and Spreadsheet hold different values, please take a count of this item and update the proper location", "INVENTORY INCONSISTENCY")
 
     # adds the QC doc to the database
     def postQCtoDB(self, ref, batch_num, qc_step, passes, total_parts, line_items, notes, username):

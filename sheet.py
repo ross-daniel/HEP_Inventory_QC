@@ -3,7 +3,7 @@
 #       Google Sheets API class for CSU HEP Lab Inventory System
 #
 #                       created by: Ross Stauder
-#                           rev: Nov 2022
+#                           rev: Nov 2023
 #             DUNE - Deep Underground Neutrino Experiment
 # --------------------------------------------------------------------------------------------
 
@@ -18,7 +18,6 @@ API_NAME = 'sheets'
 API_VERSION = 'v4'
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
-creds = None
 creds = service_account.Credentials.from_service_account_file(CLIENT_SECRET_FILE, scopes=SCOPES)
 
 
@@ -42,13 +41,14 @@ class Sheet:
         self.identifiers = self.get_data_list(1, True)  # self.get_column_ids()
         self.barcodes = self.get_data_list(1, False)
 
-    # ------------  HELPERS --------------
+    # ------------  HELPERS -------------------------------------------------------------------------------------------
 
     # finds the index of the current sheet within the current spreadsheet
+    # filler method, may be modified if InventorySheet is not at index 0
     def get_sheet_index(self):
         return 0
 
-        # helper method to convert a column number to a char identifier
+    # helper method to convert a column number to a char identifier
     def convertColumn(self, col):
         if(col == 0):
             print("sheet is empty")
@@ -58,19 +58,25 @@ class Sheet:
 
     # finds the row/column of the stock or cleaned cell for a given item
     def find_cell_rep(self, item, identifier):
-        row = None
-        col = None
-        top_row = self.identifiers  # returns the first row of the sheet
-        first_column = self.barcodes # returns the first column in the sheet
-        for index, value in enumerate(top_row):
-            if item == identifier:
-                col = index + 1
-        for index, value in enumerate(first_column):
-            if item.target in value:
-                row = index + 1
+        row = self.find_row_index(item)
+        col = self.find_column_index(identifier)
         return [row, col]
 
-    # -------------------------------------
+    def find_row_index(self, item):
+        row = -1
+        first_column = self.barcodes # returns the first column in the sheet
+        for index, value in enumerate(first_column):
+                if item.product_code == value:
+                    row = index + 1
+        return row
+
+    def find_column_index(self, identifier):
+        col = -1
+        top_row = self.identifiers  # returns the first row of the sheet
+        for index, value in enumerate(top_row):
+                if value == identifier:
+                    col = index + 1
+        return col
 
     # returns the number of rows in a sheet
     def get_rows(self):
@@ -94,65 +100,56 @@ class Sheet:
         col_count = new_response['sheets'][self.get_sheet_index()]['bandedRanges'][0]['range']['endColumnIndex']
         return col_count
 
-    def get_column_ids(self):
-        range_arg = self.sheet_name + '!1:1'  # range arg for the entire top row (A1 notation)
-        new_request = service.spreadsheets().values().get(spreadsheetId=self.sheetId, range=range_arg)
-        try:
-            new_response = new_request.execute()
-            return new_response.get('values', [])
-        except HttpError as err:
-            print(err)
-            return []
+    # -----------------------------------------------------------------------------------------------------------------
+    # -------- CLASS FUNCTIONS ----------------------------------------------------------------------------------------
 
     # returns the data at a specified cell
-    def get_data(self, item, indentifier):
-        col = indentifier.index(indentifier)
+    def get_data(self, item, identifier):
+        col = identifier.index(identifier)
         row = -1
         for index, value in enumerate(self.barcodes):
-            if item.product_code == value[0]:
+            if item.product_code == value:
                 row = index + 1
                 break
         full_row = self.get_data_list(row, True)
         print(full_row)
         return full_row[col-1]
 
-    # returns an entire row (true) or column (false)
+    # returns an entire row (true) or column (false) at the index given
     def get_data_list(self, rc_index, is_row):
         if is_row:
             range_arg = self.sheet_name + '!' + str(rc_index) + ':' + str(rc_index)  # range arg for the entire row (A1 notation)
             new_request = service.spreadsheets().values().get(spreadsheetId=self.sheetId, range=range_arg)
             try:
                 new_response = new_request.execute()
-                return new_response.get('values', [])[0]
+                # return the values of each cell in the first row as an array
+                return new_response.get('values')[0]
             except HttpError as err:
                 print(err)
                 return -1
         else:
             range_arg = self.sheet_name + '!' + self.convertColumn(rc_index) + ':' + self.convertColumn(rc_index)
+            print(range_arg)
             new_request = service.spreadsheets().values().get(spreadsheetId=self.sheetId, range=range_arg)
             try:
                 new_response = new_request.execute()
-                return new_response.get('values', [])[0]
+                column_values_list = new_response.get('values', [])  ## returns an array of arrays with only a single value [[col1_val], [col2_val], [col3_val] .... ]
+                col_values = []
+                # iterate through the list of 1D vectors that hold the column values and put them into a new list
+                for col_list_1D in column_values_list:
+                    col_values.append(col_list_1D[0])
+                # return a list of all the values in the column
+                return col_values
             except HttpError as err:
                 print(err)
                 return -1
 
-    # returns true if the spreadsheet exists
-    def exists(self):
-        ranges = []
-        include_grid_data = False
-        request = service.spreadsheets().get(spreadsheetId=self.sheetId, ranges=ranges, includeGridData=include_grid_data)
-        try:
-            request.execute()
-        except HttpError as err:
-            print("spreadsheet not found")
-            print(err)
-            return False
-        return True
+    # posts the given data to the cell defined by the item and identifier passed
+    def post_data(self, item, identifier, data):
 
-    # posts the given data to the specified cell in the current spreadsheet
-    def post_data(self, row, column, data):
-        range_arg = self.sheet_name + '!' + self.convertColumn(column) + str(row)
+        [row, col] = self.find_cell_rep(item, identifier)
+
+        range_arg = self.sheet_name + '!' + self.convertColumn(col) + str(row)
         val_in_opt = "USER_ENTERED"
         post_data = [[data]]
         request = service.spreadsheets().values().update(spreadsheetId=self.sheetId, range=range_arg, valueInputOption=val_in_opt, body={"values": post_data})
@@ -163,3 +160,6 @@ class Sheet:
             print(err)
             return err
         return result
+
+    # -----------------------------------------------------------------------------------------------------------------
+

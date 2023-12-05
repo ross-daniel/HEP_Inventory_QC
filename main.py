@@ -145,7 +145,7 @@ if __name__ == "__main__":
     if inventory_frame.sign.get() == 1:
         qty = qty*-1
     inventory_frame.destroy()
-    obj.postToDB(qty, False, ref)
+    obj.postToDB(qty, 'Stock', ref)
     update_args(csuid)  # update program arguments to keep the user signed in
     os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
     # --------------------------------------------------------------------------------------- #

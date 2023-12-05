@@ -3,7 +3,7 @@
 #   Main program for CSU HEP Lab Inventory System, controls all data flow
 #
 #                       created by: Ross Stauder
-#                           rev: October 2022
+#                           rev: 2023
 #             DUNE - Deep Underground Neutrino Experiment
 # --------------------------------------------------------------------------------------------
 
@@ -21,6 +21,7 @@ import os
 import sys
 import subprocess
 import time
+
 
 # get program arguments, used to keep a user signed in across multiple sessions
 def update_arguments(employee_id):
@@ -63,12 +64,15 @@ if __name__ == "__main__":
 
     # --------------- SIGN IN PAGE --------------------------------------------------------- #
     # if the user is not already signed in, prompt them to sign in
-    if not len(sys.argv[1:]) > 0:
+    if not len(sys.argv) > 1:
         # load first page of gui, asks for an ID to be scanned
         scan_id_frame = gui.SignInFrame(gui.root)  # create the frame
         scan_id_frame.pack()  # load the frame
         scan_id_frame.lift()
         csuid = scan_id_frame.csuid.get()
+        if not csuid:
+            gui.showMessage('The ID number you entered was invalid or an error occurred', 'Sign In ERROR')
+            os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
         employee = Student(csuid, ref)  # create a Student object with the entered csuid
         scan_id_frame.destroy()  # destroy the ID frame
     # if user is already signed in, set the current Student object to the correct user
@@ -126,8 +130,8 @@ if __name__ == "__main__":
             print(f"Batch: {batch}")
             mech_qc_frame.destroy()
             # post QC to DB
-            obj.postQCtoDB(ref, batch, step, passes, total_parts, line_num_list, notes, employee)
-            update_arguments(csuid)
+            obj.postQCtoDB(ref, batch, step, passes, total_parts, line_num_list, notes, employee.name)
+            update_arguments(csuid)  # update program arguments to keep the user signed in
             os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
         # --------------------------------------------------------------------------------------- #
     # else send them to inventory frame
@@ -139,8 +143,8 @@ if __name__ == "__main__":
     if inventory_frame.sign.get() == 1:
         qty = qty*-1
     inventory_frame.destroy()
-    obj.postToDB(qty, False, ref)
-    update_arguments(csuid)
+    obj.postToDB(qty, 'Stock', ref)
+    update_arguments(csuid)  # update program arguments to keep the user signed in
     os.execl(sys.executable, sys.executable, *sys.argv)  # end program and restart
     # --------------------------------------------------------------------------------------- #
 
